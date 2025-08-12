@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { IoClose } from "react-icons/io5";
 import { InputField } from "../../../components/InputField";
 import axios from "axios";
 import { API } from "../../../constant";
+import Select from "react-select";
 
 const schema = yup.object().shape({
   tender_name: yup.string().required("Tender Name is required"),
@@ -63,15 +64,73 @@ const schema = yup.object().shape({
     .required("Description is required"),
 });
 
-const AddTender = ({ onclose, onUpdated }) => {
+const AddTender = ({ onclose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${API}/client/getallclients`)
+      .then((res) => setClients(res.data.data))
+      .catch((err) => console.error("Error fetching clients", err));
+  }, []);
+
+ const clientIdOptions = clients.map(c => ({
+  value: c.client_id,
+  label: c.client_id
+}));
+
+const clientNameOptions = clients.map((c, i) => ({
+  value: c.client_name,
+  label: c.client_name,
+  key: `${c.client_id}-${i}` // ensures uniqueness
+}));
+
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      client_id: "",
+      client_name: "",
+      tender_name: "",
+      tender_start_date: "",
+      tender_type: "",
+      tender_duration: "",
+      tender_value: "",
+      tender_end_date: "",
+      emd: { emd_percentage: "", emd_validity: "" },
+      tender_description: "",
+      tender_location: { city: "", state: "", country: "", pincode: "" },
+      tender_contact_person: "",
+      tender_contact_phone: "",
+      tender_contact_email: "",
+    },
   });
+
+  const client_id = watch("client_id");
+  const client_name = watch("client_name");
+
+  useEffect(() => {
+    if (client_id) {
+      const found = clients.find((c) => c.client_id === client_id);
+      if (found)
+        setValue("client_name", found.client_name, { shouldValidate: true });
+    }
+  }, [client_id]);
+
+  useEffect(() => {
+    if (client_name) {
+      const found = clients.find((c) => c.client_name === client_name);
+      if (found)
+        setValue("client_id", found.client_id, { shouldValidate: true });
+    }
+  }, [client_name]);
 
   const onSubmit = async (data) => {
     console.log("submitted", data);
@@ -79,7 +138,7 @@ const AddTender = ({ onclose, onUpdated }) => {
     try {
       setLoading(true);
       await axios.post(`${API}/tender/addtender`, data);
-      if (onUpdated) onUpdated();
+      if (onSuccess) onSuccess();
       onclose();
     } catch (err) {
       console.error("Error creating tender:", err);
@@ -138,18 +197,44 @@ const AddTender = ({ onclose, onUpdated }) => {
                 />
                 <InputField
                   label="Client ID"
+                  type="select"
                   name="client_id"
                   register={register}
                   errors={errors}
-                  placeholder="Enter client ID"
+                   options={clientIdOptions}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    setValue("client_id", selectedId);
+                    const found = clients.find(
+                      (c) => c.client_id === selectedId
+                    );
+                    if (found)
+                      setValue("client_name", found.client_name, {
+                        shouldValidate: true,
+                      });
+                  }}
                 />
+
                 <InputField
                   label="Client Name"
+                  type="select"
                   name="client_name"
                   register={register}
                   errors={errors}
-                  placeholder="Enter client name"
+                   options={clientNameOptions}
+                  onChange={(e) => {
+                    const selectedName = e.target.value;
+                    setValue("client_name", selectedName);
+                    const found = clients.find(
+                      (c) => c.client_name === selectedName
+                    );
+                    if (found)
+                      setValue("client_id", found.client_id, {
+                        shouldValidate: true,
+                      });
+                  }}
                 />
+
                 <InputField
                   label="Contact Person"
                   name="tender_contact_person"

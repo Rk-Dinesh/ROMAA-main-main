@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import AddFollowUp from "./AddFollowUp";
 import { MdCancel } from "react-icons/md";
 import { IoMdSave } from "react-icons/io";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { API } from "../../../../../constant";
 
 const tenderStatus = {
   site_investigation: true,
@@ -85,24 +88,93 @@ const tenderProcessDataTemplate = [
   { label: "Agreement", key: "agreement" },
 ];
 const TenderOverView = () => {
+  const { tender_id } = useParams();
   const [addFollowup, setAddFollowup] = useState(false);
-  const [isEditingTender, setIsEditingTender] = useState(false);
-  const [tenderDetailsState, setTenderDetailsState] = useState(tenderDetails);
 
-  const [tenderProcessState, setTenderProcessState] = useState(
-    tenderProcessDataTemplate.map((item) => {
-      const value =
-        typeof tenderStatus[item.key] === "boolean"
-          ? tenderStatus[item.key]
-          : false;
-      return {
-        ...item,
-        value,
-        checked: value,
-      };
-    })
-  );
+  const [importantDates, setImportantDates] = useState([]);
+  const [customerDetails, setCustomerDetails] = useState([]);
+  const [tenderDetailsState, setTenderDetailsState] = useState([]);
+  const [tenderProcessState, setTenderProcessState] = useState([]);
+
+  const [isEditingTender, setIsEditingTender] = useState(false);
   const [isProcessChanged, setIsProcessChanged] = useState(false);
+
+  const fetchTenderOverview = async () => {
+    try {
+      const res = await axios.get(`${API}/tender/getoverview/${tender_id}`);
+      const data = res.data.data;
+
+      // Prepare display arrays from API
+      setImportantDates(data.importantDates || []);
+
+      setCustomerDetails([
+        { label: "Customer ID", value: data.customerDetails?.client_id },
+        { label: "Customer Name", value: data.customerDetails?.client_name },
+        { label: "PAN no", value: "Open Bid" },
+        { label: "CIN no", value: "Construction" },
+        { label: "GSTIN", value: "Downtown, City" },
+        { label: "VAT no", value: "Infrastructure" },
+        { label: "Phone Number", value: data.customerDetails?.contact_phone },
+        { label: "Email ID", value: data.customerDetails?.contact_email },
+        {
+          label: "Address",
+          value: `${data.customerDetails?.address?.city || ""}, ${
+            data.customerDetails?.address?.state || ""
+          }`,
+        },
+      ]);
+
+      setTenderDetailsState([
+        { label: "Tender ID", value: data.tenderDetails?.tender_id },
+        {
+          label: "Tender Published Date",
+          value: data.tenderDetails?.tender_published_date,
+        },
+        {
+          label: "Tender Process Type",
+          value: data.tenderDetails?.tender_type,
+        },
+        {
+          label: "Project Location",
+          value: `${data.tenderDetails?.project_location?.city || ""}, ${
+            data.tenderDetails?.project_location?.state || ""
+          }`,
+        },
+        { label: "Contact Person", value: data.tenderDetails?.contact_person },
+        { label: "Contact Number", value: data.tenderDetails?.contact_phone },
+        { label: "Email ID", value: data.tenderDetails?.contact_email },
+      ]);
+
+      setTenderProcessState(
+        tenderProcessDataTemplate.map((item) => ({
+          ...item,
+          checked: !!data.tenderProcess?.[item.key],
+          value: !!data.tenderProcess?.[item.key],
+        }))
+      );
+    } catch (err) {
+      console.error("Error fetching overview:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (tender_id) fetchTenderOverview();
+  }, [tender_id]);
+
+  // const [tenderProcessState, setTenderProcessState] = useState(
+  //   tenderProcessDataTemplate.map((item) => {
+  //     const value =
+  //       typeof tenderStatus[item.key] === "boolean"
+  //         ? tenderStatus[item.key]
+  //         : false;
+  //     return {
+  //       ...item,
+  //       value,
+  //       checked: value,
+  //     };
+  //   })
+  // );
+  // const [isProcessChanged, setIsProcessChanged] = useState(false);
 
   const handleCancel = () => {
     setTenderDetailsState(tenderDetails);

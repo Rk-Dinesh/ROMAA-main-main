@@ -28,7 +28,7 @@ export const InputField = ({
             {placeholder}
           </option>
           {options?.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value || `${opt.value}-${i}`} value={option.value}>
               {option.label}
             </option>
           ))}
