@@ -38,7 +38,9 @@ const Table = ({
   setCurrentPage = () => {},
   filterParams,
   setFilterParams = () => {},
-   onUpdated,
+  onUpdated,
+  onSuccess,
+  idKey,
 }) => {
   const navigate = useNavigate();
   const { searchTerm } = useSearch();
@@ -276,10 +278,33 @@ const Table = ({
                           <button
                             onClick={() => {
                               if (routepoint) {
-                                navigate(`${routepoint}`, {
-                                  state: { item },
-                                });
+                                // persist the selected item in localStorage
+                                if (idKey) {
+                                  localStorage.setItem(
+                                    `selected${idKey}`,
+                                    JSON.stringify(item)
+                                  );
+                                }
+
+                                // Check if routepoint expects a param
+                                if (idKey && routepoint.includes(":")) {
+                                  // routepoint is something like "/viewvendor/:vendorId"
+                                  const url = routepoint.replace(
+                                    `:${idKey}`,
+                                    item[idKey]
+                                  );
+                                  navigate(url, { state: { item } });
+                                } else if (idKey) {
+                                  // routepoint might be e.g. "/viewvendor" but you *want* to append ID anyway
+                                  navigate(`${routepoint}/${item[idKey]}`, {
+                                    state: { item },
+                                  });
+                                } else {
+                                  // route has no params, just navigate with state
+                                  navigate(routepoint, { state: { item } });
+                                }
                               }
+
                               if (ViewModal === true) {
                                 setShowView(false);
                               } else {
@@ -295,6 +320,7 @@ const Table = ({
                             />
                           </button>
                         )}
+
                         {DeleteModal && (
                           <button
                             onClick={() => {
@@ -336,9 +362,15 @@ const Table = ({
         setCurrentPage={setCurrentPage}
       />
 
-      {AddModal && showAdd && <AddModal onclose={() => setShowAdd(false)} />}
+      {AddModal && showAdd && (
+        <AddModal onclose={() => setShowAdd(false)} onSuccess={onSuccess} />
+      )}
       {EditModal && showEdit && (
-        <EditModal onclose={() => setShowEdit(false)} item={selectedItem} onUpdated={onUpdated}  />
+        <EditModal
+          onclose={() => setShowEdit(false)}
+          item={selectedItem}
+          onUpdated={onUpdated}
+        />
       )}
       {ViewModal && showView && (
         <ViewModal onclose={() => setShowView(false)} item={selectedItem} />

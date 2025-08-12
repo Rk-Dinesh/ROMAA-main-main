@@ -68,7 +68,7 @@ const AddClients = ({ onclose, onSuccess }) => {
       );
       toast.success("Client added successfully ✅");
       reset();
-      if (onSuccess) onSuccess(); // refresh parent list
+      if (onSuccess) onSuccess(); 
       onclose();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to add client ❌");

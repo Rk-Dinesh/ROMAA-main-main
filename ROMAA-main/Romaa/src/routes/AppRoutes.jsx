@@ -176,7 +176,7 @@ const AppRoutes = () => {
               <Route path="customers" element={<Customer />} />
               <Route path="tenders">
                 <Route index element={<Tender />} />
-                <Route path="viewtender" element={<ViewTender />} />
+                <Route path="viewtender/:tender_id" element={<ViewTender />} />
               </Route>
               <Route path="workorders">
                 <Route index element={<WorkOrder />} />
@@ -283,7 +283,7 @@ const AppRoutes = () => {
               <Route path="vendorsupplier">
                 <Route index element={<VendorSupplier />} />
                 <Route
-                  path="viewvendorsupplier"
+                  path="viewvendorsupplier/:vendorId"
                   element={<ViewVendorSupplier />}
                 />
               </Route>

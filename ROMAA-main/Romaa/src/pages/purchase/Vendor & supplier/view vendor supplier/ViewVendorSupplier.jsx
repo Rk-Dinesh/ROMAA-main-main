@@ -1,23 +1,51 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Title from "../../../../components/Title";
 import { FiFilePlus } from "react-icons/fi";
 import VendorFullDetails from "./tabs/VendorFullDetails";
 import KYCDocuments from "./tabs/KYCDocuments";
 import BillsPurchase from "./tabs/BillsPurchase";
 import CreditDebit from "./tabs/CreditDebit";
+import { API } from "../../../../constant";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-const tabs = [
+
+
+const ViewVendorSupplier = () => {
+  const location = useLocation();
+  const { vendorId } = useParams();
+  const [vendor, setVendor] = useState(location.state?.item || null);
+
+  useEffect(() => {
+    if (!vendor) {
+      const storedVendor = localStorage.getItem("selectedVendor");
+      if (storedVendor) {
+        setVendor(JSON.parse(storedVendor));
+      } else {
+
+        axios.get(`${API}/vendor/getvendor/${vendorId}`).then((res) => {
+          setVendor(res.data.data);
+        });
+      }
+    }
+  }, [vendor, vendorId]);
+
+  
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tabs = [
   {
     id: "1",
     label: "Vendor Full Details",
     outstandingAmount: "2121212",
-    component:<VendorFullDetails/>,
+    component:<VendorFullDetails vendor={vendor}/>,
   },
   {
     id: "2",
     label: "KYC Documents",
     outstandingAmount: "2121212",
-    component:<KYCDocuments/>,
+    component:<KYCDocuments vendor={vendor}/>,
     buttons: [
       {
         label: "Upload Documents",
@@ -30,7 +58,7 @@ const tabs = [
     id: "3",
     label: "Bills",
     outstandingAmount: "2121212",
-    component:<BillsPurchase/>,
+    component:<BillsPurchase vendor={vendor}/>,
     buttons: [
       {
         label: "Upload Bills",
@@ -43,19 +71,17 @@ const tabs = [
     id: "4",
     label: "Credit/Debit",
     outstandingAmount: "2121212",
-    component:<CreditDebit/>,
+    component:<CreditDebit vendor={vendor}/>,
   },
 ];
-
-const ViewVendorSupplier = () => {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const defaultTab = tabs[0].id;
   const activeTab = searchParams.get("tab") || defaultTab;
 
   const handleTabChange = (id) => {
     setSearchParams({ tab: id });
   };
+
+  
 
   const activeTabData = tabs.find((tab) => tab.id === activeTab);
   const outstandingAmount = activeTabData?.outstandingAmount || 0;

@@ -82,6 +82,7 @@ const Clients = () => {
       filterParams={filterParams}
       setFilterParams={setFilterParams}
       onUpdated={fetchClients}
+      onSuccess={fetchClients}
     />
   );
 };

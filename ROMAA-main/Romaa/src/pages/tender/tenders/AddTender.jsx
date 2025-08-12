@@ -1,44 +1,70 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { IoClose } from "react-icons/io5";
 import { InputField } from "../../../components/InputField";
+import axios from "axios";
+import { API } from "../../../constant";
 
 const schema = yup.object().shape({
-  customerName: yup.string().required("Tender Name is required"),
-  publisheddate: yup.date().required("Published Date is required"),
-  tenderType: yup
+  tender_name: yup.string().required("Tender Name is required"),
+  tender_start_date: yup.date().required("Published Date is required"),
+  tender_type: yup
     .string()
     .oneOf(
       ["item rate contarct", "percentage", "lumpsum"],
       "Invalid Tender Type"
     )
     .required("Tender Type is required"),
-  clientID: yup.string().required("Client ID is required"),
-  clientName: yup.string().required("Client Name is required"),
-  contactperson: yup.string().required("Contact Person is required"),
-  phoneNumber: yup
+  client_id: yup.string().required("Client ID is required"),
+  client_name: yup.string().required("Client Name is required"),
+  tender_contact_person: yup.string().required("Contact Person is required"),
+  tender_contact_phone: yup
     .string()
     .matches(/^[0-9]{10}$/, "Phone Number must be exactly 10 digits")
     .required("Phone Number is required"),
-  projectLocation: yup.string().required("Project Location is required"),
-  projectDuration: yup.string().required("Project Duration is required"),
-  proposalCost: yup
+  tender_contact_email: yup
+    .string()
+    .email("Invalid email")
+    .required("Contact Email is required"),
+
+  // ✅ Nested schema for tender_location
+  tender_location: yup.object({
+    city: yup.string().required("City is required"),
+    state: yup.string().required("State is required"),
+    country: yup.string().required("Country is required"),
+    pincode: yup
+      .string()
+      .matches(/^[0-9]{6}$/, "Pincode must be 6 digits")
+      .required("Pincode is required"),
+  }),
+
+  tender_duration: yup.string().required("Project Duration is required"),
+  tender_value: yup
     .number()
     .typeError("Proposal Cost must be a number")
     .positive("Proposal Cost must be a positive number")
     .required("Proposal Cost is required"),
-  duedate: yup.date().required("Due Date is required"),
-  emd: yup.string().required("EMD is required"),
-  emdexpirydate: yup.date().required("Due Date is required"),
-  description: yup
+  tender_end_date: yup.date().required("Due Date is required"),
+
+  // ✅ Nested schema for emd
+  emd: yup.object({
+    emd_percentage: yup
+      .number()
+      .typeError("EMD must be a number")
+      .required("EMD is required"),
+    emd_validity: yup.date().required("EMD Expiry Date is required"),
+  }),
+
+  tender_description: yup
     .string()
     .max(500, "Description cannot exceed 500 characters")
     .required("Description is required"),
 });
 
-const AddTender = ({ onclose }) => {
+const AddTender = ({ onclose, onUpdated }) => {
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -47,35 +73,50 @@ const AddTender = ({ onclose }) => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    onclose();
+  const onSubmit = async (data) => {
+    console.log("submitted", data);
+
+    try {
+      setLoading(true);
+      await axios.post(`${API}/tender/addtender`, data);
+      if (onUpdated) onUpdated();
+      onclose();
+    } catch (err) {
+      console.error("Error creating tender:", err);
+      alert(err.response?.data?.message || "Failed to create tender");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="font-roboto-flex fixed inset-0 grid justify-center items-center backdrop-blur-xs backdrop-grayscale-50  drop-shadow-lg z-20">
-      <div className="mx-2 shadow-lg py-2  dark:bg-overall_bg-dark  bg-white  rounded-md ">
+    <div className="font-roboto-flex fixed inset-0 grid justify-center items-center backdrop-blur-xs backdrop-grayscale-50 drop-shadow-lg z-20">
+      <div className="mx-2 shadow-lg py-2 dark:bg-overall_bg-dark bg-white rounded-md">
         <div className="grid">
           <button
             onClick={onclose}
-            className=" place-self-end   cursor-pointer  dark:bg-overall_bg-dark bg-white  rounded-full lg:-mx-4 md:-mx-4 -mx-2 lg:-my-6 md:-my-5  -my-3 lg:shadow-md md:shadow-md shadow-none lg:py-2.5 md:py-2.5 py-1 lg:px-2.5 md:px-2.5 px-1 "
+            className="place-self-end cursor-pointer dark:bg-overall_bg-dark bg-white rounded-full lg:-mx-4 md:-mx-4 -mx-2 lg:-my-6 md:-my-5 -my-3"
+            disabled={loading}
           >
             <IoClose className="size-[24px]" />
           </button>
+
           <h1 className="text-center font-medium text-2xl py-2">Add Tender</h1>
+
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid lg:grid-cols-2 grid-cols-1 lg:gap-8 gap-4 px-6 lg:py-6 py-2">
-              <div className="lg:space-y-6  space-y-2">
+              {/* Left column */}
+              <div className="lg:space-y-6 space-y-2">
                 <InputField
                   label="Tender Name"
-                  name="customerName"
+                  name="tender_name"
                   register={register}
                   errors={errors}
-                  placeholder="Enter customer name"
+                  placeholder="Enter tender name"
                 />
                 <InputField
                   label="Tender Published Date"
-                  name="publisheddate"
+                  name="tender_start_date"
                   type="date"
                   register={register}
                   errors={errors}
@@ -83,8 +124,7 @@ const AddTender = ({ onclose }) => {
                 <InputField
                   label="Tender Type"
                   type="select"
-                  name="tenderType"
-                  placeholder="Select a tender type"
+                  name="tender_type"
                   register={register}
                   errors={errors}
                   options={[
@@ -98,99 +138,139 @@ const AddTender = ({ onclose }) => {
                 />
                 <InputField
                   label="Client ID"
-                  name="clientID"
+                  name="client_id"
                   register={register}
                   errors={errors}
-                  placeholder="Enter client Id"
+                  placeholder="Enter client ID"
                 />
                 <InputField
                   label="Client Name"
-                  name="clientName"
+                  name="client_name"
                   register={register}
                   errors={errors}
                   placeholder="Enter client name"
                 />
                 <InputField
                   label="Contact Person"
-                  name="contactperson"
+                  name="tender_contact_person"
                   register={register}
                   errors={errors}
                   placeholder="Enter contact person"
                 />
                 <InputField
                   label="Phone Number"
-                  name="phoneNumber"
+                  name="tender_contact_phone"
                   register={register}
                   errors={errors}
-                  placeholder="Enter Mob.no"
+                  placeholder="Enter phone number"
+                />
+                <InputField
+                  label="Contact Email"
+                  name="tender_contact_email"
+                  type="email"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter contact email"
+                />
+
+                <InputField
+                  label="City"
+                  name="tender_location.city"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter city"
                 />
               </div>
-              <div className="lg:space-y-4 space-y-2 ">
+
+              {/* Right column */}
+              <div className="lg:space-y-4 space-y-2">
+                {/* Full location fields */}
                 <InputField
-                  label="Project Location"
-                  name="projectLocation"
+                  label="State"
+                  name="tender_location.state"
                   register={register}
                   errors={errors}
-                  placeholder="Enter location"
+                  placeholder="Enter state"
                 />
                 <InputField
-                  label="Project Duration"
-                  name="projectDuration"
+                  label="Country"
+                  name="tender_location.country"
                   register={register}
                   errors={errors}
-                  placeholder="Enter project duration"
+                  placeholder="Enter country"
+                />
+                <InputField
+                  label="Pincode"
+                  name="tender_location.pincode"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter pincode"
+                />
+
+                <InputField
+                  label="Project Duration"
+                  name="tender_duration"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter duration"
                 />
                 <InputField
                   label="Proposal Cost"
-                  name="proposalCost"
+                  name="tender_value"
                   register={register}
                   errors={errors}
-                  placeholder="Enter proposal cost"
+                  placeholder="Enter cost"
                 />
                 <InputField
                   label="Due Date"
-                  name="duedate"
+                  name="tender_end_date"
                   type="date"
                   register={register}
                   errors={errors}
                 />
                 <InputField
-                  label="EMD"
-                  name="emd"
+                  label="EMD (%)"
+                  name="emd.emd_percentage"
                   register={register}
                   errors={errors}
-                  placeholder="Enter emd"
+                  placeholder="Enter EMD percentage"
                 />
                 <InputField
                   label="EMD Expiry Date"
-                  name="emdexpirydate"
+                  name="emd.emd_validity"
+                  type="date"
                   register={register}
                   errors={errors}
-                  type="date"
                 />
                 <InputField
                   label="Description"
                   type="textarea"
-                  name="description"
-                  placeholder="Enter a brief description"
+                  name="tender_description"
                   register={register}
                   errors={errors}
+                  placeholder="Enter description"
                 />
               </div>
             </div>
+
+            {/* Buttons */}
             <div className="mx-5 text-xs flex lg:justify-end md:justify-center justify-center gap-2 mb-4">
               <button
                 type="button"
                 onClick={onclose}
-                className="cursor-pointer  border  dark:border-white border-darkest-blue dark:text-white text-darkest-blue px-6 py-2   rounded"
+                disabled={loading}
+                className="cursor-pointer border border-darkest-blue dark:border-white px-6 py-2 rounded"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="cursor-pointer px-6 bg-darkest-blue text-white  rounded"
+                disabled={loading}
+                className={`cursor-pointer px-6 text-white rounded ${
+                  loading ? "bg-gray-500 cursor-not-allowed" : "bg-darkest-blue"
+                }`}
               >
-                Save
+                {loading ? "Saving..." : "Save"}
               </button>
             </div>
           </form>
