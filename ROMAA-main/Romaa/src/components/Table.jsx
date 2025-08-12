@@ -10,6 +10,7 @@ import { BiFilterAlt } from "react-icons/bi";
 import Pagination from "./Pagination";
 import { useSearch } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
+import { IoClose } from "react-icons/io5";
 
 const Table = ({
   endpoint,
@@ -32,15 +33,15 @@ const Table = ({
   pagetitle,
   onExport,
   contentMarginTop = "mt-4",
+  totalPages = 1,
+  currentPage = 1,
+  setCurrentPage = () => {},
+  filterParams,
+  setFilterParams = () => {},
+   onUpdated,
 }) => {
   const navigate = useNavigate();
   const { searchTerm } = useSearch();
-  const [totalPages, setTotalPages] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filterParams, setFilterParams] = useState({
-    fromdate: "",
-    todate: "",
-  });
   const [selectedItem, setSelectedItem] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -124,6 +125,18 @@ const Table = ({
               bgColor="dark:bg-layout-dark bg-white"
               textColor="dark:text-white text-darkest-blue"
               onClick={() => setShowFilter(true)}
+            />
+          )}
+          {FilterModal && (filterParams?.fromdate || filterParams?.todate) && (
+            <Button
+              button_icon={<IoClose size={20} />}
+              button_name="Clear"
+              bgColor="dark:bg-layout-dark bg-white"
+              textColor="dark:text-white text-darkest-blue"
+              onClick={() => {
+                setFilterParams({ fromdate: "", todate: "" });
+                setCurrentPage(1);
+              }}
             />
           )}
         </div>
@@ -253,7 +266,10 @@ const Table = ({
                             }}
                             className="cursor-pointer dark:bg-icon-dark-blue bg-[#C9E0FF] p-1.5 rounded"
                           >
-                            <Pencil size={14} className="dark:text-white text-blue-500" />
+                            <Pencil
+                              size={14}
+                              className="dark:text-white text-blue-500"
+                            />
                           </button>
                         )}
                         {(ViewModal || routepoint) && (
@@ -273,7 +289,10 @@ const Table = ({
                             }}
                             className="cursor-pointer dark:bg-icon-dark-green bg-[#BAFFBA] p-1.5 rounded"
                           >
-                            <LuEye size={14} className="text-[#008000] dark:text-[#BAFFBA]" />
+                            <LuEye
+                              size={14}
+                              className="text-[#008000] dark:text-[#BAFFBA]"
+                            />
                           </button>
                         )}
                         {DeleteModal && (
@@ -319,7 +338,7 @@ const Table = ({
 
       {AddModal && showAdd && <AddModal onclose={() => setShowAdd(false)} />}
       {EditModal && showEdit && (
-        <EditModal onclose={() => setShowEdit(false)} item={selectedItem} />
+        <EditModal onclose={() => setShowEdit(false)} item={selectedItem} onUpdated={onUpdated}  />
       )}
       {ViewModal && showView && (
         <ViewModal onclose={() => setShowView(false)} item={selectedItem} />

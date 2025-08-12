@@ -31,7 +31,7 @@ const InputField = ({
         ${errors[name] ? "border-red-500" : ""}`}
     />
     {errors[name] && (
-      <p className="text-red-500 text-xs col-span-8 text-end">
+      <p className="text-red-500 text-xs col-span-12 text-right mt-1">
         {errors[name].message}
       </p>
     )}
@@ -49,54 +49,69 @@ const Filters = ({ onclose, onFilter }) => {
 
   const onSubmit = (data) => {
     console.log("Filter Data:", data);
-    onFilter(data); // Pass the date range to the parent component
-    onclose(); // Close the filter modal
+    onFilter(data); // Send filter data to parent
+    onclose(); // Close modal
   };
 
   return (
-    <div className="font-roboto-flex fixed inset-0 grid justify-center items-center backdrop-blur-xs backdrop-grayscale-50 drop-shadow-lg z-20">
-      <div className="mx-2 shadow-lg py-2 dark:bg-overall_bg-dark bg-white rounded-md w-96">
-        <div   onClick={onclose} className="grid">
+    // ✅ Background overlay — clicking outside modal closes it
+    <div
+      className="font-roboto-flex fixed inset-0 grid justify-center items-center backdrop-blur-xs backdrop-grayscale-50 drop-shadow-lg z-20"
+      onClick={onclose}
+    >
+      {/* ✅ Modal content — stop click propagation so clicking inside doesn't close modal */}
+      <div
+        className="mx-2 shadow-lg py-2 dark:bg-overall_bg-dark bg-white rounded-md w-96"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ✅ Close button */}
+        <div className="grid">
           <button
-          
+            type="button"
+            onClick={onclose}
             className="place-self-end cursor-pointer dark:bg-overall_bg-dark bg-white rounded-full -mx-4 -my-4 shadow-md py-2.5 px-2.5"
           >
             <IoClose className="text-2xl" />
           </button>
-          <h1 className="text-center font-medium text-2xl py-2">Filter</h1>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <InputField
-              label="From Date"
-              name="fromdate"
-              type="date"
-              register={register}
-              errors={errors}
-            />
-            <InputField
-              label="To Date"
-              name="todate"
-              type="date"
-              register={register}
-              errors={errors}
-            />
-
-            <div className="mx-5 text-xs flex justify-end gap-2 my-4">
-              <button
-                type="button"
-                onClick={onclose}
-                className="border dark:border-white border-darkest-blue dark:text-white text-darkest-blue px-6 py-2 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="bg-darkest-blue text-white px-6 py-2 rounded"
-              >
-                Show Results
-              </button>
-            </div>
-          </form>
         </div>
+
+        {/* ✅ Heading */}
+        <h1 className="text-center font-medium text-2xl py-2">Filter</h1>
+
+        {/* ✅ Filter form */}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <InputField
+            label="From Date"
+            name="fromdate"
+            type="date"
+            register={register}
+            errors={errors}
+          />
+          <InputField
+            label="To Date"
+            name="todate"
+            type="date"
+            register={register}
+            errors={errors}
+          />
+
+          {/* ✅ Action buttons */}
+          <div className="mx-5 text-xs flex justify-end gap-2 my-4">
+            <button
+              type="button"
+              onClick={onclose}
+              className="border dark:border-white border-darkest-blue dark:text-white text-darkest-blue px-6 py-2 rounded"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-darkest-blue text-white px-6 py-2 rounded"
+            >
+              Show Results
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

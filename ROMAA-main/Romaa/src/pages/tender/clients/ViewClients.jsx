@@ -3,19 +3,21 @@ import { IoClose } from "react-icons/io5";
 import EditClients from "./EditClients";
 
 const clientFields = [
-  { label: "Client ID", key: "id" },
-  { label: "Client Name", key: "name" },
-  { label: "PAN no", key: "pan" },
-  { label: "CIN no", key: "cin" },
+  { label: "Client ID", key: "client_id" },
+  { label: "Client Name", key: "client_name" },
+  { label: "PAN no", key: "pan_no" },
+  { label: "CIN no", key: "cin_no" },
   { label: "GSTIN", key: "gstin" },
-  { label: "Phone number", key: "phone" },
-  { label: "Email", key: "email" },
-  { label: "City", key: "city" },
-  { label: "State", key: "state" },
-  { label: "Country", key: "country" },
-  { label: "Pincode", key: "pincode" },
+  { label: "Phone number", key: "contact_phone" },
+  { label: "Email", key: "contact_email" },
+ { label: "City", key: "address.city" },
+  { label: "State", key: "address.state" },
+  { label: "Country", key: "address.country" },
+  { label: "Pincode", key: "address.pincode" },
 ];
-
+const getValue = (obj, path) => {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+};
 const ViewClients = ({ onclose, item }) => {
   const [editModal, setEditModal] = useState(false);
   if (editModal) {
@@ -35,16 +37,17 @@ const ViewClients = ({ onclose, item }) => {
           <p className="pb-6 text-center font-semibold text-lg col-span-12">
             View Clients
           </p>
-          {clientFields.map((field) => (
-            <React.Fragment key={field.key}>
-              <label className="font-semibold col-span-7">{field.label}</label>
-              <p className="text-sm font-light col-span-5">
-                {item?.[field.key] !== undefined && item?.[field.key] !== ""
-                  ? item[field.key]
-                  : "-"}
-              </p>
-            </React.Fragment>
-          ))}
+         {clientFields.map((field) => {
+            const value = getValue(item, field.key);
+            return (
+              <React.Fragment key={field.key}>
+                <label className="font-semibold col-span-7">{field.label}</label>
+                <p className="text-sm font-light col-span-5">
+                  {value !== undefined && value !== "" ? value : "-"}
+                </p>
+              </React.Fragment>
+            );
+          })}
         </form>
 
         <div className="flex justify-end items-center gap-2 py-8 mx-6 text-sm font-extralight">
