@@ -7,76 +7,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { API } from "../../../../../constant";
 
-const tenderStatus = {
-  site_investigation: true,
-  pre_bid_meeting: false,
-  bid_submission: true,
-  technical_bid_opening: false,
-  commercial_bid_opening: false,
-  negotiation: false,
-  work_order: false,
-  agreement: false,
-};
 
-const importantDates = [
-  {
-    title: "Last Date of Document Purchase",
-    date: "12/06/2025",
-    time: "12:00 PM",
-    address: "123 Street, Chennai",
-  },
-  {
-    title: "PreBid Meeting Date",
-    date: "15/06/2025",
-    time: "2:00 PM",
-    address: "Conference Room, Chennai",
-  },
-  {
-    title: "Last Date of Bid Submission",
-    date: "20/06/2025",
-    time: "11:59 PM",
-    address: "Online",
-  },
-  {
-    title: "Bid Opening Date",
-    date: "21/06/2025",
-    time: "10:00 AM",
-    address: "Main Office, Chennai",
-  },
-  {
-    title: "Last Date of Technical Bid Submission",
-    date: "22/06/2025",
-    time: "5:00 PM",
-    address: "Online",
-  },
-  { title: "Validity Period", date: "30/06/2025", time: "11:59 PM" },
-];
-
-const customerDetails = [
-  { label: "Customer ID", value: "TND-2345" },
-  { label: "Customer Name", value: "2025-05-10" },
-  { label: "PAN no", value: "Open Bid" },
-  { label: "CIN no", value: "Construction" },
-  { label: "GSTIN", value: "Downtown, City" },
-  { label: "VAT no", value: "Infrastructure" },
-  { label: "Phone Number", value: "John Doe" },
-  { label: "Contact Number", value: "+1 234 567 890" },
-  { label: "Email ID", value: "johndoe@example.com" },
-  { label: "Address", value: "123 Main St, New York, NY 10001" },
-];
-const tenderDetails = [
-  { label: "Tender ID", value: "TND-2345" },
-  { label: "Tender Published Date", value: "2025-05-10" },
-  { label: "Tender Process Type", value: "Open Bid" },
-  { label: "Tender Type", value: "Construction" },
-  { label: "Project Location", value: "Downtown, City" },
-  { label: "Project Type", value: "Infrastructure" },
-  { label: "Contact Person", value: "John Doe" },
-  { label: "Contact Person Location", value: "New York" },
-  { label: "Contact Number", value: "+1 234 567 890" },
-  { label: "Email ID", value: "johndoe@example.com" },
-  { label: "Address", value: "123 Main St, New York, NY 10001" },
-];
 const tenderProcessDataTemplate = [
   { label: "Site Investigation", key: "site_investigation" },
   { label: "Pre bid Meeting", key: "pre_bid_meeting" },
@@ -104,15 +35,14 @@ const TenderOverView = () => {
       const res = await axios.get(`${API}/tender/getoverview/${tender_id}`);
       const data = res.data.data;
 
-      // Prepare display arrays from API
       setImportantDates(data.importantDates || []);
 
       setCustomerDetails([
         { label: "Customer ID", value: data.customerDetails?.client_id },
         { label: "Customer Name", value: data.customerDetails?.client_name },
-        { label: "PAN no", value: "Open Bid" },
-        { label: "CIN no", value: "Construction" },
-        { label: "GSTIN", value: "Downtown, City" },
+        { label: "PAN no", value: data.customerDetails?.pan_no },
+        { label: "CIN no", value: data.customerDetails?.cin_no },
+        { label: "GSTIN", value: data.customerDetails?.gstin },
         { label: "VAT no", value: "Infrastructure" },
         { label: "Phone Number", value: data.customerDetails?.contact_phone },
         { label: "Email ID", value: data.customerDetails?.contact_email },
@@ -161,21 +91,6 @@ const TenderOverView = () => {
     if (tender_id) fetchTenderOverview();
   }, [tender_id]);
 
-  // const [tenderProcessState, setTenderProcessState] = useState(
-  //   tenderProcessDataTemplate.map((item) => {
-  //     const value =
-  //       typeof tenderStatus[item.key] === "boolean"
-  //         ? tenderStatus[item.key]
-  //         : false;
-  //     return {
-  //       ...item,
-  //       value,
-  //       checked: value,
-  //     };
-  //   })
-  // );
-  // const [isProcessChanged, setIsProcessChanged] = useState(false);
-
   const handleCancel = () => {
     setTenderDetailsState(tenderDetails);
     setIsEditingTender(false);
@@ -200,16 +115,30 @@ const TenderOverView = () => {
     setIsProcessChanged(true);
   };
 
-  const handleProcessSave = () => {
-    setIsProcessChanged(false);
-    // Create an object with label: boolean
-    const processStatus = {};
-    tenderProcessState.forEach((item) => {
-      processStatus[item.key] = !!item.checked;
-    });
-    console.log("Process status:", processStatus);
-    // Pass processStatus to your API or parent handler here
+  const handleProcessSave = async () => {
+    try {
+      const processStatus = {};
+      tenderProcessState.forEach((item) => {
+        processStatus[item.key] = !!item.checked;
+      });
+
+      console.log(processStatus);
+
+      const res = await axios.put(
+        `${API}/tender/statuscheck/${tender_id}`,
+        processStatus
+      );
+
+      console.log(res);
+
+      setIsProcessChanged(false);
+      console.log("Process status saved successfully.");
+    } catch (error) {
+      console.error("Error saving process status:", error);
+      alert("Failed to save process status. Please try again.");
+    }
   };
+
   return (
     <>
       <div className="font-roboto-flex grid grid-cols-12 h-full gap-4  overflow-y-auto no-scrollbar py-2">
@@ -236,11 +165,11 @@ const TenderOverView = () => {
                   <p className="col-span-8 text-end text-gray-500">
                     {item.time || "-"}
                   </p>
-                  {item.address && (
+                  {item.notes && (
                     <>
-                      <p className="col-span-4 ">Address</p>
+                      <p className="col-span-4 ">Notes</p>
                       <p className="col-span-8 text-end text-gray-500">
-                        {item.address}
+                        {item.notes}
                       </p>
                     </>
                   )}
@@ -348,7 +277,14 @@ const TenderOverView = () => {
           </div>
         </div>
       </div>
-      {addFollowup && <AddFollowUp onclose={() => setAddFollowup(false)} />}
+      {addFollowup && (
+        <AddFollowUp
+          onclose={() => setAddFollowup(false)}
+          onSuccess={() => {
+            fetchTenderOverview();
+          }}
+        />
+      )}
     </>
   );
 };

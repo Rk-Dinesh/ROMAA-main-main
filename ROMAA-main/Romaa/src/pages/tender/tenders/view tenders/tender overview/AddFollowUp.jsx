@@ -4,8 +4,12 @@ import { InputField } from "../../../../../components/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import axios from "axios";
+import { API } from "../../../../../constant";
+import { useParams } from "react-router-dom";
 
 const schema = yup.object().shape({
+  title:yup.string().required("Title is required"),
   time: yup.string().required("Time is required"),
   date: yup.date().required("Due Date is required"),
   notes: yup
@@ -14,7 +18,8 @@ const schema = yup.object().shape({
     .required("Description is required"),
 });
 
-const AddFollowUp = ({ onclose }) => {
+const AddFollowUp = ({ onclose, onSuccess }) => {
+   const { tender_id } = useParams();
   const {
     register,
     handleSubmit,
@@ -23,9 +28,20 @@ const AddFollowUp = ({ onclose }) => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    onclose();
+  const onSubmit = async (data) => {
+    try {
+      console.log("Form Data:", data);
+
+      // POST to backend with tender_id
+      const res = await axios.post(`${API}/tender/addfollowup/${tender_id}`, data);
+
+      console.log("Response:", res.data);
+      onclose();
+       onSuccess();
+    } catch (error) {
+      console.error("Error adding followup:", error);
+      alert("Failed to add followup");
+    }
   };
   return (
     <>
@@ -36,6 +52,13 @@ const AddFollowUp = ({ onclose }) => {
         child={
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4 p-6">
+               <InputField
+                label=" Tilte"
+                name="title"
+                register={register}
+                errors={errors}
+                type="text"
+              />
               <InputField
                 label=" Date"
                 name="date"
