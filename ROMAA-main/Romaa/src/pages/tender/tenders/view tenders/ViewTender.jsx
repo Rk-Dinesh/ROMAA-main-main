@@ -79,15 +79,15 @@ const tabs = [
     label: "Zero Cost",
     component: <ZeroCost />,
     buttons: [
-      {
-        label: "Add Zero Cost",
-        className: "bg-darkest-blue text-white",
-      },
-      {
-        label: "Upload Zero Cost",
-        className:
-          "dark:bg-layout-dark  dark:text-white  bg-white text-darkest-blue",
-      },
+      // {
+      //   label: "Add Zero Cost",
+      //   className: "bg-darkest-blue text-white",
+      // },
+      // {
+      //   label: "Upload Zero Cost",
+      //   className:
+      //     "dark:bg-layout-dark  dark:text-white  bg-white text-darkest-blue",
+      // },
       {
         label: "Export",
         icon: <TbFileExport size={23} />,
