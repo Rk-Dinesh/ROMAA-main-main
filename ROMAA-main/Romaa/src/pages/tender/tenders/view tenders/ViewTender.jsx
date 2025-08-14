@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Title from "../../../../components/Title";
 import { TbFileExport } from "react-icons/tb";
 import { LuFileCheck } from "react-icons/lu";
 import { MdArrowBackIosNew } from "react-icons/md";
 import TenderOverView from "./tender overview/TenderOverView";
 import ApproveTender from "./tender overview/ApproveTender";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Plan from "./plans/Plan";
 import BOQ from "./Boq/BOQ";
 import ZeroCost from "./zero cost/ZeroCost";
@@ -18,6 +18,8 @@ import AddBoq from "./Boq/AddBoq";
 import EMD from "./Emd/EMD";
 import UploadModal from "./project documents/UploadModal";
 import AddEMD from "./Emd/AddEMD";
+import axios from "axios";
+import { API } from "../../../../constant";
 
 const tabs = [
   {
@@ -185,11 +187,30 @@ const tabs = [
 // };
 
 const ViewTender = () => {
+  const { tender_id } = useParams();
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState({ action: null, tab: null });
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isApproved, setIsApproved] = useState(false);
   const defaultTab = tabs[0].id;
   const activeTab = searchParams.get("tab") || defaultTab;
+
+  const checkApprovalStatus = async () => {
+    try {
+      const res = await axios.get(`${API}/tender/approval-status/${tender_id}`);
+      console.log(res);
+
+      if (res.data.success) {
+        setIsApproved(res.data.approved);
+      }
+    } catch (error) {
+      toast.error("Error checking approval status");
+    }
+  };
+
+  useEffect(() => {
+    checkApprovalStatus();
+  }, [tender_id]);
 
   const handleTabChange = (id) => {
     setSearchParams({ tab: id });
@@ -204,14 +225,19 @@ const ViewTender = () => {
       "Upload Documents": "uploadDocuments",
       "Add EMD": "addEmd",
     };
+    const newBtn = {
+      ...button,
+      disabled: button.label === "Approve Tender" && isApproved, // disable if approved
+    };
 
-    if (modalMap[button.label]) {
+    if (modalMap[button.label] && !newBtn.disabled) {
       return {
-        ...button,
+        ...newBtn,
         onClick: () => setOpenModal(modalMap[button.label]),
       };
     }
-    return button;
+
+    return newBtn;
   });
 
   return (
@@ -227,10 +253,16 @@ const ViewTender = () => {
             {buttonsWithHandlers.map((button, index) => (
               <button
                 key={index}
-                className={`cursor-pointer w-fit text-sm flex items-center gap-2 px-4 py-2 rounded-md ${button.className}`}
+                className={`cursor-pointer w-fit text-sm flex items-center gap-2 px-4 py-2 rounded-md ${
+                  button.className
+                } ${button.disabled ? "cursor-not-allowed bg-green-500 " : ""}`}
                 onClick={button.onClick}
+                disabled={button.disabled}
               >
-                {button.icon} {button.label}
+                {button.icon}{" "}
+                {button.label === "Approve Tender" && isApproved
+                  ? "Tender Approved"
+                  : button.label}
               </button>
             ))}
           </div>
