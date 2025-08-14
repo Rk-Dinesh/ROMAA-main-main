@@ -40,7 +40,9 @@ const Table = ({
   setFilterParams = () => {},
   onUpdated,
   onSuccess,
+  onDelete,
   idKey,
+  
 }) => {
   const navigate = useNavigate();
   const { searchTerm } = useSearch();
@@ -380,6 +382,8 @@ const Table = ({
           onclose={() => setShowDelete(false)}
           item={selectedItem}
           deletetitle={deletetitle}
+          onDelete={onDelete}
+          idKey={idKey}
         />
       )}
       {FilterModal && showFilter && (

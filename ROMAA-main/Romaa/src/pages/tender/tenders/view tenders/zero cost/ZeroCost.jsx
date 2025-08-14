@@ -6,6 +6,7 @@ import Table from '../../../../../components/Table'
 import { API } from '../../../../../constant';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 const customerColumns = [
   { label: "Item Code", key: "item_name" },
@@ -48,6 +49,17 @@ const ZeroCost = () => {
     fetchBoqItems();
   }, [tender_id, currentPage]);
 
+  const handleDeleteZeroCostItem = async (item_code) => {
+    try {
+      await axios.delete(`${API}/boq/removeitem/${tender_id}/${item_code}`);
+      toast.success("Item deleted successfully");
+      fetchBoqItems(); // refresh table
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete BOQ item");
+    }
+  };
+
   return (
     <>
     <Table
@@ -55,7 +67,7 @@ const ZeroCost = () => {
       subtitle={`Tender: ${tender_id}`}
       endpoint={items}
       columns={customerColumns}
-      EditModal={true}       
+     // EditModal={true}       
       exportModal={false}
       DeleteModal={DeleteModal}
       deletetitle="Zero Cost"
@@ -64,6 +76,8 @@ const ZeroCost = () => {
       setCurrentPage={setCurrentPage}
       onUpdated={fetchBoqItems}
       onSuccess={fetchBoqItems}
+      onDelete={handleDeleteZeroCostItem}
+      idKey="item_code"
     />
     
     </>

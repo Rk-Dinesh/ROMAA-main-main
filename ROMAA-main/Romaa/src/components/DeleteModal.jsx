@@ -1,8 +1,16 @@
-
 import { IoClose } from "react-icons/io5";
 import Delete from "../assets/images/Delete.png";
 
-const DeleteModal = ({ deletetitle , onclose, Children }) => {
+const DeleteModal = ({
+  deletetitle,
+  onclose,
+  Children,
+  onDelete,
+  idKey,
+  item,
+}) => {
+  console.log(item[idKey]);
+
   return (
     <>
       <div className=" font-roboto-flex fixed inset-0 flex justify-center  items-center backdrop-grayscale-50  drop-shadow-lg  backdrop-blur-xs">
@@ -19,7 +27,8 @@ const DeleteModal = ({ deletetitle , onclose, Children }) => {
             </span>
             <p className="text-center font-semibold text-2xl">Are you sure ?</p>
             <p className="w-72 text-center font-normal text-sm">
-              Are you sure ? Do you want to delete this {deletetitle } Permanently.
+              Are you sure ? Do you want to delete this {deletetitle}{" "}
+              Permanently.
             </p>
           </div>
           <div className="flex justify-center gap-6 my-6 text-sm font-normal">
@@ -29,7 +38,13 @@ const DeleteModal = ({ deletetitle , onclose, Children }) => {
             >
               Cancel
             </button>
-            <button className=" cursor-pointer dark:text-white bg-red-600 px-6 py-1.5 rounded-sm ">
+            <button
+              className=" cursor-pointer dark:text-white bg-red-600 px-6 py-1.5 rounded-sm "
+              onClick={async () => {
+                await onDelete(item?.[idKey]);
+                onclose();
+              }}
+            >
               Delete
             </button>
           </div>

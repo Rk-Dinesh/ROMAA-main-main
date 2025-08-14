@@ -57,10 +57,10 @@ const tabs = [
     label: "BOQ",
     component: <BOQ />,
     buttons: [
-      {
-        label: "Add BOQ",
-        className: "bg-darkest-blue text-white",
-      },
+      // {
+      //   label: "Add BOQ",
+      //   className: "bg-darkest-blue text-white",
+      // },
       {
         label: "Upload BOQ",
         className:
@@ -118,10 +118,10 @@ const tabs = [
     label: "EMD",
     component: <EMD />,
     buttons: [
-      {
-        label: "Add EMD",
-        className: "bg-darkest-blue text-white",
-      },
+      // {
+      //   label: "Add EMD",
+      //   className: "bg-darkest-blue text-white",
+      // },
       {
         label: "Export",
         icon: <TbFileExport size={23} />,

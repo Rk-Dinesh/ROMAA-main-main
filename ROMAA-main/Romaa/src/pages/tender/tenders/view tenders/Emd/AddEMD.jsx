@@ -1,26 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { IoClose } from "react-icons/io5";
 import axios from "axios";
 import { InputField } from "../../../../../components/InputField";
+import { useParams } from "react-router-dom";
+import { API } from "../../../../../constant";
 
 const schema = yup.object().shape({
-  date: yup.string().required("Date is required"),
-  company: yup.string().required("company name is required"),
-  proposedvalue: yup.string().required("proposed value is required"),
-  amount: yup
+  payment_date: yup.date().required("Date is required"),
+  company_name: yup.string().required("Company name is required"),
+  proposed_amount: yup
     .number()
-    .typeError("Amount must be a number")
-    .required("Amount is required")
-    .min(0, "Amount cannot be negative"),
-  bankname: yup.string().required("bank name is required"),
-  level: yup.string().required("level is required"),
-  status: yup.string().required("status is required"),
+    .typeError("Proposed value must be a number")
+    .required("Proposed value is required")
+    .min(0, "Proposed value cannot be negative"),
+  payment_bank: yup.string().required("Bank name is required"),
+  payment_method: yup.string().nullable(),
+  level: yup.string().required("Level is required"),
+  status: yup
+    .string()
+    .oneOf(["SUBMITTED", "PENDING", "REJECTED"])
+    .required("Permitted Status is required"),
+  notes: yup.string().nullable(),
 });
 
-const AddEMD = ({ onclose }) => {
+const AddEMD = ({ onclose,onSuccess }) => {
+  const { tender_id } = useParams();
+  const [emdData, setEmdData] = useState([]);
+  const fetchEMD = async () => {
+    try {
+      const res = await axios.get(`${API}/tender/gettenderemd/${tender_id}`);
+      if (res.data.status && res.data.data) {
+        console.log(res.data.data);
+
+        setEmdData(res.data.data || []);
+      } else {
+        setEmdData([]);
+      }
+    } catch {
+      toast.error("Failed to load EMD data");
+    }
+  };
+
+  useEffect(() => {
+    fetchEMD();
+  }, [tender_id]);
+
   const {
     register,
     handleSubmit,
@@ -29,10 +56,28 @@ const AddEMD = ({ onclose }) => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
+  try {
+    const payload = {
+      company_name: data.company_name,
+      proposed_amount: Number(data.proposed_amount), 
+      payment_date: data.payment_date,
+      payment_bank: data.payment_bank,
+      payment_method: data.payment_method,
+      level: data.level,
+      status: data.status,
+      notes: data.notes,
+      created_by_user: "ADMIN"
+    };
+
+    await axios.post(`${API}/emd/addproposal/${tender_id}`, payload);
+    if (onSuccess) onSuccess();
     onclose();
-    console.log(data);
-  };
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.message || "Failed to add EMD proposal");
+  }
+};
 
   return (
     <div className="font-roboto-flex fixed inset-0 grid justify-center items-center backdrop-blur-xs backdrop-grayscale-50  drop-shadow-lg z-20">
@@ -44,49 +89,51 @@ const AddEMD = ({ onclose }) => {
           >
             <IoClose className="size-[24px]" />
           </button>
-          <h1 className="text-center font-medium text-xl py-2">
-            Edit Work Order
-          </h1>
+          <h1 className="text-center font-medium text-xl py-2">Add Emd</h1>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid  px-6 py-6">
               <div className="space-y-4">
                 <InputField
                   label="Date"
-                  name="date"
+                  name="payment_date"
+                  type="date"
                   register={register}
                   errors={errors}
-                  type="date"
                 />
+
                 <InputField
                   label="Company Name"
-                  name="company"
+                  name="company_name"
                   register={register}
                   errors={errors}
                   placeholder="Enter company name"
                 />
+
                 <InputField
                   label="Proposed Value"
-                  name="proposedvalue"
+                  name="proposed_amount"
+                  type="number"
                   register={register}
                   errors={errors}
                   placeholder="Enter proposed value"
                 />
 
                 <InputField
-                  label="EMD Amount"
-                  name="amount"
-                  type="number"
-                  register={register}
-                  errors={errors}
-                  placeholder="Enter emd amount"
-                />
-                <InputField
                   label="Bank Name"
-                  name="bankname"
+                  name="payment_bank"
                   register={register}
                   errors={errors}
                   placeholder="Enter bank name"
                 />
+
+                <InputField
+                  label="Payment Method"
+                  name="payment_method"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter payment method"
+                />
+
                 <InputField
                   label="Level"
                   name="level"
@@ -94,12 +141,26 @@ const AddEMD = ({ onclose }) => {
                   errors={errors}
                   placeholder="Enter level"
                 />
+
                 <InputField
                   label="Status"
                   name="status"
+                  type="select"
                   register={register}
                   errors={errors}
-                  placeholder="Enter status"
+                  options={[
+                    { value: "SUBMITTED", label: "Submitted" },
+                    { value: "PENDING", label: "Pending" },
+                    { value: "REJECTED", label: "Rejected" },
+                  ]}
+                />
+
+                <InputField
+                  label="Notes"
+                  name="notes"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter notes"
                 />
               </div>
             </div>

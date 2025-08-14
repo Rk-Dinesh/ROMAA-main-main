@@ -5,6 +5,8 @@ import Table from "../../../../../components/Table";
 import axios from "axios";
 import { API } from "../../../../../constant";
 import { toast } from "react-toastify";
+import { LuUserRoundSearch } from "react-icons/lu";
+import AddBoq from "./AddBoq";
 
 const customerColumns = [
   { label: "Item Code", key: "item_name" },
@@ -47,6 +49,16 @@ const BOQ = () => {
     fetchBoqItems();
   }, [tender_id, currentPage]);
 
+  const handleDeleteBoqItem = async (item_code) => {
+    try {
+      await axios.delete(`${API}/boq/removeitem/${tender_id}/${item_code}`);
+      toast.success("Item deleted successfully");
+      fetchBoqItems(); // refresh table
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete BOQ item");
+    }
+  };
 
   return (
     <Table
@@ -54,15 +66,20 @@ const BOQ = () => {
       subtitle={`Tender: ${tender_id}`}
       endpoint={items}
       columns={customerColumns}
-      EditModal={true}       
+      //EditModal={true}
       exportModal={false}
       DeleteModal={DeleteModal}
       deletetitle="BOQ"
+      AddModal={AddBoq}
+      addButtonLabel="Add Boq"
+      addButtonIcon={<LuUserRoundSearch size={24} />}
       totalPages={totalPages}
       currentPage={currentPage}
       setCurrentPage={setCurrentPage}
       onUpdated={fetchBoqItems}
       onSuccess={fetchBoqItems}
+      onDelete={handleDeleteBoqItem}
+      idKey="item_code"
     />
   );
 };

@@ -1,7 +1,9 @@
+import { LuUserRoundSearch } from "react-icons/lu";
+import { ContractData } from "../../../../../components/Data";
+import DeleteModal from "../../../../../components/DeleteModal";
+import Table from "../../../../../components/Table";
+import AddContractWorker from "./AddContract";
 
-import { ContractData } from '../../../../../components/Data';
-import DeleteModal from '../../../../../components/DeleteModal';
-import Table from '../../../../../components/Table'
 
 const customerColumns = [
   { label: "Employee Name", key: "employeename" },
@@ -12,22 +14,23 @@ const customerColumns = [
   { label: "Status", key: "status" },
 ];
 
-
 const Contract = () => {
   return (
     <>
-    <Table
-    contentMarginTop='mt-0'
-      endpoint={ContractData}
-      columns={customerColumns}
-      ViewModal={true}
-      exportModal={false}
-      DeleteModal={DeleteModal}
-      deletetitle="Contract"
-    />
-    
+      <Table
+        contentMarginTop="mt-0"
+        endpoint={ContractData}
+        columns={customerColumns}
+        ViewModal={true}
+        AddModal={AddContractWorker}
+        addButtonLabel="Add Contractor"
+        addButtonIcon={<LuUserRoundSearch size={24} />}
+        exportModal={false}
+        DeleteModal={DeleteModal}
+        deletetitle="Contract"
+      />
     </>
-  )
-}
+  );
+};
 
-export default Contract
+export default Contract;
