@@ -133,19 +133,6 @@ const tabs = [
     ],
   },
   {
-    id: "7",
-    label: "Contract",
-    component: <Contract />,
-    buttons: [
-      {
-        label: "Export",
-        icon: <TbFileExport size={23} />,
-        className:
-          "dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
-      },
-    ],
-  },
-  {
     id: "8",
     label: "Vendor",
     component: <Vendor />,
@@ -158,6 +145,20 @@ const tabs = [
       },
     ],
   },
+  {
+    id: "7",
+    label: "Contract",
+    component: <Contract />,
+    buttons: [
+      {
+        label: "Export",
+        icon: <TbFileExport size={23} />,
+        className:
+          "dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
+      },
+    ],
+  },
+  
   {
     id: "9",
     label: "Preliminary",

@@ -61,8 +61,7 @@ const ContractNmr = () => {
           todate: filterParams.todate,
         },
       });
-      console.log(res);
-
+    
       setContracts(res.data.data);
       setTotalPages(res.data.totalPages);
     } catch (err) {
@@ -85,6 +84,7 @@ const ContractNmr = () => {
       endpoint={contracts}
       AddModal={AddContractor}
       editroutepoint={"editcontractor"}
+      routepoint="viewcontractor"
       FilterModal={Filters}
       addButtonLabel="Add Contractor"
       addButtonIcon={<AiOutlineFileAdd size={23} />}

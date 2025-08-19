@@ -5,13 +5,28 @@ import { Pencil } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import EditNMR from "./EditNMR";
 
+const contractorFields = [
+      { label: "Worker Id", key: "worker_id" },
+  { label: "Name", key: "employee_name" },
+
+  { label: "Contact Phone", key: "contact_phone" },
+  {
+    label: "Address",
+    key: "address",
+    render: (item) =>
+      `${item.address?.city || ""}, ${item.address?.state || ""}, ${item.address?.country || ""} - ${item.address?.pincode || ""}`,
+  },
+
+  { label: "Status", key: "status" },
+];
+
 const ViewNMR = () => {
   const { state } = useLocation();
-  const employee = state?.item || {};
+ const contractor = state?.item || {};
   const navigate = useNavigate();
   const [onEdit, setOnEdit] = useState(false);
 
-  if (!employee) {
+  if (!contractor) {
     return <div className="p-4 text-red-600">No employee data found.</div>;
   }
 
@@ -38,35 +53,20 @@ const ViewNMR = () => {
             <div className="col-span-2 flex justify-center items-center mb-4 ">
               <p className="text-xl font-semibold">View NMR</p>
             </div>
-            <div className=" flex flex-col col-span-2 sm:grid grid-cols-2 w-full space-y-2">
-              <p className="text-sm col-span-1 font-bold dark:text-gray-200 text-gray-800">
-                Name
-              </p>
-              <p className="text-sm col-span-1 dark:text-gray-400 text-gray-600">
-                {employee.name}
-              </p>
-
-              <p className="text-sm col-span-1 font-bold dark:text-gray-200 text-gray-800">
-                Role
-              </p>
-              <p className="text-sm col-span-1 dark:text-gray-400 text-gray-600">
-                {employee.role}
-              </p>
-
-              <p className="text-sm col-span-1 font-bold dark:text-gray-200 text-gray-800">
-                Department
-              </p>
-              <p className="text-sm col-span-1 dark:text-gray-400 text-gray-600">
-                {employee.dept}
-              </p>
-
-              <p className="text-sm col-span-1 font-bold dark:text-gray-200 text-gray-800">
-                Site Assigned
-              </p>
-              <p className="text-sm col-span-1 dark:text-gray-400 text-gray-600">
-                {employee.siteassign}
-              </p>
-            </div>
+            <div className="flex flex-col col-span-2 sm:grid grid-cols-2 w-full space-y-2">
+                          {contractorFields.map((field) => (
+                            <React.Fragment key={field.key}>
+                              <p className="text-sm col-span-1 font-bold dark:text-gray-200 text-gray-800">
+                                {field.label}
+                              </p>
+                              <p className="text-sm col-span-1 dark:text-gray-400 text-gray-600">
+                                {field.render
+                                  ? field.render(contractor)
+                                  : contractor[field.key] || "-"}
+                              </p>
+                            </React.Fragment>
+                          ))}
+                        </div>
           </div>
         </>
       )}

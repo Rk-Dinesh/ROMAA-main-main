@@ -32,7 +32,7 @@ const schema = yup.object().shape({
 const EditContractor = ({ onUpdated, onclose }) => {
   const { state } = useLocation();
   const contractor = state?.item;
-  console.log(contractor);
+ 
   
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
