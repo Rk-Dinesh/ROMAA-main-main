@@ -25,6 +25,8 @@ const Headers = () => {
           <input
             type="text"
             className="w-56 placeholder:text-darkest-blue dark:placeholder:text-white outline-0"
+            id="search"
+            name="search"
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

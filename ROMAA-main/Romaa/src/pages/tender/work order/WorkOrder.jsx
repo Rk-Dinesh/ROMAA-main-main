@@ -71,8 +71,9 @@ const WorkOrder = () => {
       columns={Columns}
       // AddModal={AddWorkOrder}
      // EditModal={EditWorkOrder}
-        routepoint={"viewworkorder"}
+      routepoint={"viewworkorder"}
       FilterModal={Filters}
+      idKey='tender_id'
     />
   );
 };

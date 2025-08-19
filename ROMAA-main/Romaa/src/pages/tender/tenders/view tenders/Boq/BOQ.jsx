@@ -9,7 +9,7 @@ import { LuUserRoundSearch } from "react-icons/lu";
 import AddBoq from "./AddBoq";
 
 const customerColumns = [
-  { label: "Item Code", key: "item_name" },
+  { label: "Item Name", key: "item_name" },
   { label: "Item Description", key: "description" },
   { label: "Quantity", key: "quantity" },
   { label: "Units", key: "unit" },

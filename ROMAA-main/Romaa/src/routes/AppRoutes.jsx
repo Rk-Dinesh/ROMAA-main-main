@@ -154,6 +154,7 @@ import ViewDailyProject from "../pages/projects/schedule/schedule/tabs/daily/Vie
 import ViewProjectSchedule from "../pages/projects/schedule/schedule/tabs/project schedule/ViewProjectSchedule";
 import ViewManPowerHistogram from "../pages/projects/schedule/schedule/tabs/Man Power Histogram/ViewManPowerHistogram";
 import ViewMechinerySchedule from "../pages/projects/schedule/schedule/tabs/machinery Schedule/ViewMechinerySchedule";
+import EditContractor from "../pages/Hr/contract & Nmr/EditContractor";
 
 const AppRoutes = () => {
   return (
@@ -180,7 +181,7 @@ const AppRoutes = () => {
               </Route>
               <Route path="workorders">
                 <Route index element={<WorkOrder />} />
-                <Route path="viewworkorder">
+                <Route path="viewworkorder/:tender_id">
                   <Route index element={<ViewWorkOrder />} />
                   <Route
                     path="viewworkordertable"
@@ -415,7 +416,11 @@ const AppRoutes = () => {
                 <Route index element={<PayRoll />} />
                 <Route path="viewpayroll" element={<ViewPayroll />} />
               </Route>
-              <Route path="contractnmr" element={<ContractNmr />} />
+              <Route path="contractnmr">
+                <Route index element={<ContractNmr />} />
+                 <Route path="editcontractor" element={<EditContractor />} />
+              </Route >
+              
               <Route path="NMRattendance" element={<NMRattendance />} />
               <Route path="nmr">
                 <Route index element={<NMR />} />

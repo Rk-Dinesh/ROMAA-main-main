@@ -23,6 +23,7 @@ const ClientColumns = [
   },
   { label: "Phone", key: "contact_phone" },
   { label: "Email", key: "contact_email" },
+  
 ];
 
 const Clients = () => {

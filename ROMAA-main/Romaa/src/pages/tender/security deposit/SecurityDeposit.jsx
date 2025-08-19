@@ -4,6 +4,7 @@ import Filters from "../../../components/Filters";
 import Table from "../../../components/Table";
 import axios from "axios";
 import { API } from "../../../constant";
+import EditSecurityDeposit from "./EditSecurityDeposit";
 
 
 
@@ -90,6 +91,8 @@ const SecurityDeposit = () => {
       endpoint={deposit}
       columns={Columns}
       FilterModal={Filters}
+      EditModal={EditSecurityDeposit}
+       onUpdated={fetchTendersEMDSD}
     />
   );
 };

@@ -4,6 +4,7 @@ import Filters from "../../../components/Filters";
 import Table from "../../../components/Table";
 import axios from "axios";
 import { API } from "../../../constant";
+import EditEMDModal from "./EditEMDModal";
 
 const Columns = [
   { label: "Tender ID", key: "tender_id" },
@@ -41,8 +42,6 @@ const Columns = [
       item.emd?.approved_emd_details?.[0]?.emd_note ?? "-"
   }
 ];
-
-
 
 const EMD = () => {
   const [EMD, setEMD] = useState([]);
@@ -89,8 +88,10 @@ const EMD = () => {
       pagetitle="EMD(Earnest Money Deposit)"
       endpoint={EMD}
       columns={Columns}
+      EditModal={EditEMDModal}
       FilterModal={Filters}
       onExport={() => console.log("Exporting...")}
+      onUpdated={fetchTendersEMDSD}
     />
   );
 };
