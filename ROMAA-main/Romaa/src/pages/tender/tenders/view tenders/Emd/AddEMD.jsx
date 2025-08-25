@@ -16,8 +16,16 @@ const schema = yup.object().shape({
     .typeError("Proposed value must be a number")
     .required("Proposed value is required")
     .min(0, "Proposed value cannot be negative"),
+  emd_value: yup
+    .number()
+    .typeError("EMD value must be a number")
+    .required("EMD value is required")
+    .min(0, "EMD value cannot be negative"),
   payment_bank: yup.string().required("Bank name is required"),
   payment_method: yup.string().nullable(),
+  dd_no: yup
+    .string()
+    .required("DD_NO value is required"),
   level: yup.string().required("Level is required"),
   status: yup
     .string()
@@ -26,7 +34,7 @@ const schema = yup.object().shape({
   notes: yup.string().nullable(),
 });
 
-const AddEMD = ({ onclose,onSuccess }) => {
+const AddEMD = ({ onclose, onSuccess }) => {
   const { tender_id } = useParams();
   const [emdData, setEmdData] = useState([]);
   const fetchEMD = async () => {
@@ -56,28 +64,30 @@ const AddEMD = ({ onclose,onSuccess }) => {
     resolver: yupResolver(schema),
   });
 
-const onSubmit = async (data) => {
-  try {
-    const payload = {
-      company_name: data.company_name,
-      proposed_amount: Number(data.proposed_amount), 
-      payment_date: data.payment_date,
-      payment_bank: data.payment_bank,
-      payment_method: data.payment_method,
-      level: data.level,
-      status: data.status,
-      notes: data.notes,
-      created_by_user: "ADMIN"
-    };
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        company_name: data.company_name,
+        proposed_amount: Number(data.proposed_amount),
+        emd_amount: Number(data.emd_value),
+        payment_date: data.payment_date,
+        payment_bank: data.payment_bank,
+        payment_method: data.payment_method,
+        dd_no: data.dd_no,
+        level: data.level,
+        status: data.status,
+        notes: data.notes,
+        created_by_user: "ADMIN",
+      };
 
-    await axios.post(`${API}/emd/addproposal/${tender_id}`, payload);
-    if (onSuccess) onSuccess();
-    onclose();
-  } catch (error) {
-    console.error(error);
-    alert(error.response?.data?.message || "Failed to add EMD proposal");
-  }
-};
+      await axios.post(`${API}/emd/addproposal/${tender_id}`, payload);
+      if (onSuccess) onSuccess();
+      onclose();
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Failed to add EMD proposal");
+    }
+  };
 
   return (
     <div className="font-roboto-flex fixed inset-0 grid justify-center items-center backdrop-blur-xs backdrop-grayscale-50  drop-shadow-lg z-20">
@@ -110,12 +120,21 @@ const onSubmit = async (data) => {
                 />
 
                 <InputField
-                  label="Proposed Value"
+                  label="Bid Value"
                   name="proposed_amount"
                   type="number"
                   register={register}
                   errors={errors}
                   placeholder="Enter proposed value"
+                />
+
+                <InputField
+                  label="EMD Value"
+                  name="emd_value"
+                  type="number"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter EMD value"
                 />
 
                 <InputField
@@ -133,7 +152,14 @@ const onSubmit = async (data) => {
                   errors={errors}
                   placeholder="Enter payment method"
                 />
-
+                <InputField
+                  label="DD No"
+                  name="dd_no"
+                  // type="number"
+                  register={register}
+                  errors={errors}
+                  placeholder="Enter DD number"
+                />
                 <InputField
                   label="Level"
                   name="level"

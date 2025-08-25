@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 // ✅ Yup validation schema
 const schema = yup.object().shape({
   workOrder_id: yup.string().required("Work Order ID is required"),
-  workOrder_issued_by: yup.string().required("Issued By is required"),
+  workOrder_issued_date: yup.date().required("Issued Date is required"),
 });
 
 const ApproveTender = ({ onclose}) => {
@@ -40,7 +40,7 @@ const ApproveTender = ({ onclose}) => {
     resolver: yupResolver(schema),
     defaultValues: {
       workOrder_id: "",
-      workOrder_issued_by: "",
+      workOrder_issued_date: "",
     },
   });
 
@@ -131,11 +131,12 @@ const ApproveTender = ({ onclose}) => {
 
           <div className="col-span-12">
             <InputField
-              label="Issued By"
-              name="workOrder_issued_by"
+              label="Issued Date"
+              name="workOrder_issued_date"
               register={register}
               errors={errors}
-              placeholder="Enter Issued By"
+              placeholder="Enter Issued Date"
+              type="date"
             />
           </div>
 

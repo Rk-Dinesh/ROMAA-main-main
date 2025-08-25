@@ -48,7 +48,7 @@ const schema = yup.object().shape({
 
   // Nested EMD schema
   emd: yup.object({
-    emd_percentage: yup
+    emd_amount: yup
       .number()
       .typeError("EMD must be a number")
       .required("EMD is required"),
@@ -90,7 +90,7 @@ const EditTender = ({ item, onclose, onUpdated }) => {
         ? new Date(item.tender_end_date).toISOString().split("T")[0]
         : "",
       emd: {
-        emd_percentage: item.emd?.emd_percentage,
+        emd_amount: item.emd?.emd_amount,
         emd_validity: item.emd?.emd_validity
           ? new Date(item.emd.emd_validity).toISOString().split("T")[0]
           : "",
@@ -153,7 +153,7 @@ const EditTender = ({ item, onclose, onUpdated }) => {
               <InputField label="Client ID" name="client_id" register={register} errors={errors} placeholder="Enter client ID" />
               <InputField label="Client Name" name="client_name" register={register} errors={errors} placeholder="Enter client name" />
               <InputField label="Contact Person" name="tender_contact_person" register={register} errors={errors} placeholder="Enter contact person" />
-              <InputField label="Phone Number" name="tender_contact_phone" register={register} errors={errors} placeholder="Enter phone number" />
+              <InputField label="Phone Number" name="tender_contact_phone" register={register} errors={errors} placeholder="Enter phone number" type="number"/>
               <InputField label="Contact Email" name="tender_contact_email" type="email" register={register} errors={errors} placeholder="Enter contact email" />
               <InputField label="City" name="tender_location.city" register={register} errors={errors} placeholder="Enter city" />
             </div>
@@ -164,9 +164,9 @@ const EditTender = ({ item, onclose, onUpdated }) => {
               <InputField label="Country" name="tender_location.country" register={register} errors={errors} placeholder="Enter country" />
               <InputField label="Pincode" name="tender_location.pincode" register={register} errors={errors} placeholder="Enter pincode" />
               <InputField label="Project Duration" name="tender_duration" register={register} errors={errors} placeholder="Enter duration" />
-              <InputField label="Proposal Cost" name="tender_value" register={register} errors={errors} placeholder="Enter cost" />
+              <InputField label="Tender Value" name="tender_value" register={register} errors={errors} placeholder="Enter cost" type="number"/>
               <InputField label="Due Date" name="tender_end_date" type="date" register={register} errors={errors} />
-              <InputField label="EMD (%)" name="emd.emd_percentage" register={register} errors={errors} placeholder="Enter EMD percentage" />
+              <InputField label="EMD Value" name="emd.emd_amount" register={register} errors={errors} placeholder="Enter EMD Value" type="number"/>
               <InputField label="EMD Expiry Date" name="emd.emd_validity" type="date" register={register} errors={errors} />
               <InputField label="Description" type="textarea" name="tender_description" register={register} errors={errors} placeholder="Enter description" />
             </div>

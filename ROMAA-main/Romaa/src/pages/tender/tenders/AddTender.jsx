@@ -29,8 +29,6 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email")
     .required("Contact Email is required"),
-
-  // ✅ Nested schema for tender_location
   tender_location: yup.object({
     city: yup.string().required("City is required"),
     state: yup.string().required("State is required"),
@@ -51,7 +49,7 @@ const schema = yup.object().shape({
 
   // ✅ Nested schema for emd
   emd: yup.object({
-    emd_percentage: yup
+    emd_amount: yup
       .number()
       .typeError("EMD must be a number")
       .required("EMD is required"),
@@ -104,7 +102,7 @@ const clientNameOptions = clients.map((c, i) => ({
       tender_duration: "",
       tender_value: "",
       tender_end_date: "",
-      emd: { emd_percentage: "", emd_validity: "" },
+      emd: { emd_amount: "", emd_validity: "" },
       tender_description: "",
       tender_location: { city: "", state: "", country: "", pincode: "" },
       tender_contact_person: "",
@@ -248,6 +246,7 @@ const clientNameOptions = clients.map((c, i) => ({
                   register={register}
                   errors={errors}
                   placeholder="Enter phone number"
+                  type="number"
                 />
                 <InputField
                   label="Contact Email"
@@ -300,11 +299,12 @@ const clientNameOptions = clients.map((c, i) => ({
                   placeholder="Enter duration"
                 />
                 <InputField
-                  label="Proposal Cost"
+                  label="Tender Value"
                   name="tender_value"
                   register={register}
                   errors={errors}
                   placeholder="Enter cost"
+                   type="number"
                 />
                 <InputField
                   label="Due Date"
@@ -314,11 +314,12 @@ const clientNameOptions = clients.map((c, i) => ({
                   errors={errors}
                 />
                 <InputField
-                  label="EMD (%)"
-                  name="emd.emd_percentage"
+                  label="EMD Value"
+                  name="emd.emd_amount"
                   register={register}
                   errors={errors}
-                  placeholder="Enter EMD percentage"
+                  placeholder="Enter EMD Value"
+                   type="number"
                 />
                 <InputField
                   label="EMD Expiry Date"

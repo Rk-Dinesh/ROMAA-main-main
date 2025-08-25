@@ -7,7 +7,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { API } from "../../../../../constant";
 
-
 const tenderProcessDataTemplate = [
   { label: "Site Investigation", key: "site_investigation" },
   { label: "Pre bid Meeting", key: "pre_bid_meeting" },
@@ -43,7 +42,7 @@ const TenderOverView = () => {
         { label: "PAN no", value: data.customerDetails?.pan_no },
         { label: "CIN no", value: data.customerDetails?.cin_no },
         { label: "GSTIN", value: data.customerDetails?.gstin },
-        { label: "VAT no", value: "Infrastructure" },
+      //  { label: "VAT no", value: "Infrastructure" },
         { label: "Phone Number", value: data.customerDetails?.contact_phone },
         { label: "Email ID", value: data.customerDetails?.contact_email },
         {
@@ -56,9 +55,14 @@ const TenderOverView = () => {
 
       setTenderDetailsState([
         { label: "Tender ID", value: data.tenderDetails?.tender_id },
+        { label: "Tender Name", value: data.tenderDetails?.tender_name },
         {
           label: "Tender Published Date",
-          value: data.tenderDetails?.tender_published_date,
+          value: data.tenderDetails?.tender_published_date
+            ? new Date(
+                data.tenderDetails.tender_published_date
+              ).toLocaleDateString("en-GB")
+            : "",
         },
         {
           label: "Tender Process Type",
@@ -73,6 +77,7 @@ const TenderOverView = () => {
         { label: "Contact Person", value: data.tenderDetails?.contact_person },
         { label: "Contact Number", value: data.tenderDetails?.contact_phone },
         { label: "Email ID", value: data.tenderDetails?.contact_email },
+        {label: "Tender Value", value: data.tenderDetails?.tender_value || "-"},
       ]);
 
       setTenderProcessState(

@@ -98,12 +98,12 @@ const EMD = () => {
           <p className="text-xl font-semibold">EMD</p>
         </div>
         <div className="flex flex-col col-span-2 sm:grid grid-cols-2 w-full space-y-2">
-          <p className="text-sm col-span-1 font-bold dark:text-white text-gray-800">
+          {/* <p className="text-sm col-span-1 font-bold dark:text-white text-gray-800">
             EMD Percentage
           </p>
           <p className="text-sm col-span-1 dark:text-gray-300 text-gray-600">
             {emdData?.emd?.emd_percentage}
-          </p>
+          </p> */}
           <p className="text-sm col-span-1 font-bold dark:text-white text-gray-800">
             EMD Value
           </p>

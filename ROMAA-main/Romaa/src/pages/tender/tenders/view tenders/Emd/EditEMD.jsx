@@ -16,7 +16,7 @@ const schema = yup.object().shape({
     .required("Permitted Status is required"),
   level: yup.string().required("Level is required"),
   security_deposit: yup.object({
-    security_deposit_percentage: yup
+    security_deposit_amount: yup
       .number()
       .typeError("Security Deposit must be a number")
       .required("SD is required"),
@@ -57,7 +57,7 @@ const EditEMD = ({ onclose, item, onUpdated }) => {
     defaultValues: {
       status: "",
       level: "",
-       security_deposit: { security_deposit_percentage: "", security_deposit_validity: "" },
+       security_deposit: { security_deposit_amount: "", security_deposit_validity: "" },
     },
   });
   const onSubmit = async (data) => {
@@ -127,11 +127,12 @@ const EditEMD = ({ onclose, item, onUpdated }) => {
                 placeholder="Enter level"
               />
               <InputField
-                label="Security Deposit (%)"
-                name="security_deposit.security_deposit_percentage"
+                label="Security Deposit Amount"
+                name="security_deposit.security_deposit_amount"
                 register={register}
                 errors={errors}
-                placeholder="Enter SD percentage"
+                placeholder="Enter amount"
+                type="number"
               />
               <InputField
                 label=" Expiry Date"

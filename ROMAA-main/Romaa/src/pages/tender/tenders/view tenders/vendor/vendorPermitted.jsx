@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -11,8 +11,9 @@ import { useParams } from "react-router-dom";
 
 // ✅ Validation Schema
 const schema = yup.object().shape({
+  type: yup.string().required("Vendor Type is required"),
   vendor_id: yup.string().required("Vendor ID is required"),
-  vendor_name: yup.string().required("Vendor Name is required"),
+  company_name: yup.string().required("Vendor Name is required"),
   agreement_start: yup.date().required("Agreement Start Date is required"),
   agreement_end: yup.date().nullable(),
   permitted_by: yup.string().required("Permitted By is required"),
@@ -25,15 +26,64 @@ const schema = yup.object().shape({
 
 const AddPermittedVendor = ({ onclose, onSuccess }) => {
   const { tender_id } = useParams();
+ const [vendors, setVendors] = useState([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
     reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  const vendorType = watch("type");
+  const vendorId = watch("vendor_id");
+  const vendorName = watch("company_name");
+
+  useEffect(() => {
+    if (vendorType) {
+      axios
+        .get(`${API}/vendor/getallvendorsselect?type=${vendorType}`)
+        .then((res) => {
+          setVendors(res.data.data || []);
+          console.log("Fetched vendors", res.data.data);
+          
+          setValue("vendor_id", "");
+          setValue("company_name", "");
+        })
+        .catch((err) => {
+          console.error("Failed to fetch vendors", err);
+          setVendors([]);
+        });
+    } else {
+      setVendors([]);
+      setValue("vendor_id", "");
+      setValue("company_name", "");
+    }
+  }, [vendorType, setValue]);
+
+  useEffect(() => {
+    if (vendorId) {
+      const found = vendors.find((v) => v.vendor_id === vendorId);
+      if (found && found.company_name !== vendorName) {
+        setValue("company_name", found.company_name);
+      }
+    }
+  }, [vendorId, vendorName, vendors, setValue]);
+
+  useEffect(() => {
+    if (vendorName) {
+      const found = vendors.find((v) => v.company_name === vendorName);
+      if (found && found.vendor_id !== vendorId) {
+        setValue("vendor_id", found.vendor_id);
+      }
+    }
+  }, [vendorName, vendorId, vendors, setValue]);
+
+ 
 
   const onSubmit = async (data) => {
     try {
@@ -42,7 +92,8 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
         vendors: [
           {
             vendor_id: data.vendor_id,
-            vendor_name: data.vendor_name,
+            type: data.type,
+            vendor_name: data.company_name,
             agreement_start: data.agreement_start,
             agreement_end: data.agreement_end,
             permitted_by: data.permitted_by,
@@ -72,19 +123,57 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
       child={
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-5 px-6 py-6">
-            <InputField
+                  <InputField
+                label="Vendor Type"
+                name="type"
+                type="select"
+                register={register}
+                errors={errors}
+                placeholder="Select Vendor type"
+                options={[
+                  { label: "Cement Supplier", value: "Cement Supplier" },
+                  { label: "Steel Supplier", value: "Steel Supplier" },
+                  { label: "Sand Supplier", value: "Sand Supplier" },
+                  { label: "Aggregate Supplier", value: "Aggregate Supplier" },
+                  { label: "Bricks Supplier", value: "Bricks Supplier" },
+                  {
+                    label: "Electrical Contractor",
+                    value: "Electrical Contractor",
+                  },
+                  {
+                    label: "Plumbing Contractor",
+                    value: "Plumbing Contractor",
+                  },
+                  { label: "Paint Supplier", value: "Paint Supplier" },
+                  { label: "Tiles Supplier", value: "Tiles Supplier" },
+                  { label: "Wood Supplier", value: "Wood Supplier" },
+                ]}
+              />
+               <InputField
               label="Vendor ID"
               name="vendor_id"
+              type="select"
               register={register}
               errors={errors}
-              placeholder="Enter Vendor ID"
+              placeholder="Select Vendor ID"
+              options={vendors.map((v) => ({ label: v.vendor_id, value: v.vendor_id }))}
             />
+
             <InputField
               label="Vendor Name"
-              name="vendor_name"
+              name="company_name"
+              type="select"
               register={register}
               errors={errors}
-              placeholder="Enter Vendor Name"
+              placeholder="Select Vendor Name"
+              options={vendors.map((v) => ({ label: v.company_name, value: v.company_name }))}
+            />""
+             <InputField
+              label="Remarks"
+              name="remarks"
+              register={register}
+              errors={errors}
+              placeholder="Optional remarks"
             />
             <InputField
               label="Agreement Start Date"
@@ -119,13 +208,7 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
                 { value: "REJECTED", label: "Rejected" },
               ]}
             />
-            <InputField
-              label="Remarks"
-              name="remarks"
-              register={register}
-              errors={errors}
-              placeholder="Optional remarks"
-            />
+           
           </div>
 
           <div className="mx-5 text-xs flex justify-end gap-2 mb-4">
