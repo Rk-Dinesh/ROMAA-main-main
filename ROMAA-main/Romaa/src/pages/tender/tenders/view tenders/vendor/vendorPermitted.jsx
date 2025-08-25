@@ -3,11 +3,10 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import Modal from "../../../../../components/Modal"; 
+import Modal from "../../../../../components/Modal";
 import { InputField } from "../../../../../components/InputField";
 import { API } from "../../../../../constant";
 import { useParams } from "react-router-dom";
-
 
 // ✅ Validation Schema
 const schema = yup.object().shape({
@@ -26,7 +25,7 @@ const schema = yup.object().shape({
 
 const AddPermittedVendor = ({ onclose, onSuccess }) => {
   const { tender_id } = useParams();
- const [vendors, setVendors] = useState([]);
+  const [vendors, setVendors] = useState([]);
 
   const {
     register,
@@ -50,7 +49,7 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
         .then((res) => {
           setVendors(res.data.data || []);
           console.log("Fetched vendors", res.data.data);
-          
+
           setValue("vendor_id", "");
           setValue("company_name", "");
         })
@@ -72,7 +71,7 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
         setValue("company_name", found.company_name);
       }
     }
-  }, [vendorId, vendorName, vendors, setValue]);
+  }, [vendorId, setValue]);
 
   useEffect(() => {
     if (vendorName) {
@@ -81,39 +80,41 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
         setValue("vendor_id", found.vendor_id);
       }
     }
-  }, [vendorName, vendorId, vendors, setValue]);
+  }, [vendorName, setValue]);
 
- 
+const onSubmit = async (data) => {
+  try {
+   
+    const vendors = [
+      {
+        vendor_id: data.vendor_id,
+        type: data.type,
+        vendor_name: data.company_name,
+        agreement_start: new Date(data.agreement_start),
+        agreement_end: new Date(data.agreement_end),
+        permitted_by: data.permitted_by,
+        permitted_status: data.permitted_status,
+        remarks: data.remarks,
+      },
+    ];
 
-  const onSubmit = async (data) => {
-    try {
-      const payload = {
-        tender_id,
-        vendors: [
-          {
-            vendor_id: data.vendor_id,
-            type: data.type,
-            vendor_name: data.company_name,
-            agreement_start: data.agreement_start,
-            agreement_end: data.agreement_end,
-            permitted_by: data.permitted_by,
-            permitted_status: data.permitted_status,
-            remarks: data.remarks,
-          },
-        ],
-      };
+    const payload = {
+      tender_id: tender_id, 
+      vendors: vendors, 
+    };
 
-      console.log("Payload", payload);
+    console.log("Payload", payload);
 
-      await axios.post(`${API}/permittedvendor/add`, payload);
-      if (onSuccess) onSuccess();
-      reset();
-      onclose();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add permitted vendor");
-    }
-  };
+    await axios.post(`${API}/permittedvendor/add`, payload);
+    if (onSuccess) onSuccess();
+    reset();
+    onclose();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to add permitted vendor");
+  }
+};
+
 
   return (
     <Modal
@@ -123,52 +124,77 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
       child={
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-5 px-6 py-6">
-                  <InputField
-                label="Vendor Type"
-                name="type"
-                type="select"
-                register={register}
-                errors={errors}
-                placeholder="Select Vendor type"
-                options={[
-                  { label: "Cement Supplier", value: "Cement Supplier" },
-                  { label: "Steel Supplier", value: "Steel Supplier" },
-                  { label: "Sand Supplier", value: "Sand Supplier" },
-                  { label: "Aggregate Supplier", value: "Aggregate Supplier" },
-                  { label: "Bricks Supplier", value: "Bricks Supplier" },
-                  {
-                    label: "Electrical Contractor",
-                    value: "Electrical Contractor",
-                  },
-                  {
-                    label: "Plumbing Contractor",
-                    value: "Plumbing Contractor",
-                  },
-                  { label: "Paint Supplier", value: "Paint Supplier" },
-                  { label: "Tiles Supplier", value: "Tiles Supplier" },
-                  { label: "Wood Supplier", value: "Wood Supplier" },
-                ]}
-              />
-               <InputField
-              label="Vendor ID"
-              name="vendor_id"
+            <InputField
+              label="Vendor Type"
+              name="type"
               type="select"
               register={register}
               errors={errors}
-              placeholder="Select Vendor ID"
-              options={vendors.map((v) => ({ label: v.vendor_id, value: v.vendor_id }))}
+              placeholder="Select Vendor type"
+              options={[
+                { label: "Cement Supplier", value: "Cement Supplier" },
+                { label: "Steel Supplier", value: "Steel Supplier" },
+                { label: "Sand Supplier", value: "Sand Supplier" },
+                { label: "Aggregate Supplier", value: "Aggregate Supplier" },
+                { label: "Bricks Supplier", value: "Bricks Supplier" },
+                {
+                  label: "Electrical Contractor",
+                  value: "Electrical Contractor",
+                },
+                {
+                  label: "Plumbing Contractor",
+                  value: "Plumbing Contractor",
+                },
+                { label: "Paint Supplier", value: "Paint Supplier" },
+                { label: "Tiles Supplier", value: "Tiles Supplier" },
+                { label: "Wood Supplier", value: "Wood Supplier" },
+              ]}
+            />
+            <InputField
+              label="Vendor ID"
+              type="select"
+              name="vendor_id"
+              register={register}
+              errors={errors}
+              options={vendors.map((v) => ({
+                label: v.vendor_id,
+                value: v.vendor_id,
+              }))}
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                setValue("vendor_id", selectedId);
+                const found = vendors.find((v) => v.vendor_id === selectedId);
+                if (found)
+                  setValue("company_name", found.company_name, {
+                    shouldValidate: true,
+                  });
+              }}
             />
 
             <InputField
               label="Vendor Name"
-              name="company_name"
               type="select"
+              name="company_name"
               register={register}
               errors={errors}
-              placeholder="Select Vendor Name"
-              options={vendors.map((v) => ({ label: v.company_name, value: v.company_name }))}
-            />""
-             <InputField
+              options={vendors.map((v) => ({
+                label: v.company_name,
+                value: v.company_name,
+              }))}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+                setValue("company_name", selectedName);
+                const found = vendors.find(
+                  (v) => v.company_name === selectedName
+                );
+                if (found)
+                  setValue("vendor_id", found.vendor_id, {
+                    shouldValidate: true,
+                  });
+              }}
+            />
+
+            <InputField
               label="Remarks"
               name="remarks"
               register={register}
@@ -208,7 +234,6 @@ const AddPermittedVendor = ({ onclose, onSuccess }) => {
                 { value: "REJECTED", label: "Rejected" },
               ]}
             />
-           
           </div>
 
           <div className="mx-5 text-xs flex justify-end gap-2 mb-4">
