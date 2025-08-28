@@ -38,29 +38,30 @@ const WorkOrderOverview = () => {
         { label: "Work order ID", value: data.workOrderDetails?.workOrder_id },
         {
           label: "Work order date",
-          value: data.workOrderDetails?.workOrder_issued_date,
+          value: new Date(data.workOrderDetails?.workOrder_issued_date).toLocaleDateString("en-GB"),
         },
         { label: "Client name", value: data.workOrderDetails?.client_name },
         { label: "Project name", value: data.workOrderDetails?.tender_name },
-        { label: "Agreement no", value: "AG-2025-045" },
-        { label: "Agreement date", value: "2025-04-25" },
-        {
-          label: "Address of authority",
+        {label:"Tender Type", value: data.workOrderDetails?.tender_type},
+        // { label: "Agreement no", value: "AG-2025-045" },
+        // { label: "Agreement date", value: "2025-04-25" },
+         {
+          label: "Project Location",
           value: `${data.workOrderDetails?.project_location?.city || ""}, ${
             data.workOrderDetails?.project_location?.state || ""
           }`,
         },
-        { label: "Awarding authority", value: "Mr. John Doe" },
+        // { label: "Awarding authority", value: "Mr. John Doe" },
         {
           label: "Project Duration(in Months)",
           value: data.workOrderDetails?.tender_duration,
         },
         {
           label: "Date of actual commencement",
-          value: data.workOrderDetails?.tender_published_date,
+          value: new Date(data.workOrderDetails?.tender_published_date).toLocaleDateString("en-GB"),
         },
-        { label: "Stipulated date of completion", value: "2026-11-15" },
-        { label: "Agreement type", value: "Lump Sum" },
+       // { label: "Stipulated date of completion", value: "2026-11-15" },
+        // { label: "Agreement type", value: data.workOrderDetails?.agreement_type },
         { label: "Work order amount", value: data.workOrderDetails?.tender_value },
        
       ]);

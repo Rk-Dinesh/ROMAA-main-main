@@ -15,21 +15,64 @@ const schema = yup.object().shape({
   contractStart_date: yup.date().required("Contract Start Date is required"),
   contractEnd_date: yup.date().required("Contract End Date is required"),
   contratctSite: yup.string().required("Contract Site is required"),
-  contractStatus: yup.string().required("Contract Status is required"),
+  contractStatus: yup.string().oneOf(
+    ["Active", "Inactive", "Completed", "Terminated"],
+    "Contract Status is required"
+  ).required("Contract Status is required"),
 });
 
 const AddContractWorker = ({ onclose, onSuccess }) => {
   const { tender_id } = useParams();
+  const [contractWorkers, setContractWorkers] = useState([]);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm({
     resolver: yupResolver(schema),
   });
+
+  const workerId = watch("contractWorker_id");
+  const workerName = watch("contractWorker_name");
+
+  useEffect(() => {
+    axios
+      .get(`${API}/contractor/getallselect`) 
+      .then((res) => {
+        setContractWorkers(res.data.data || []);
+      })
+      .catch(() => setContractWorkers([]));
+  }, []);
+
+  // Sync worker name when ID changes
+  useEffect(() => {
+    if (workerId) {
+      const found = contractWorkers.find((cw) => cw.contractor_id === workerId);
+      if (found && found.company_name !== workerName) {
+        setValue("contractWorker_name", found.company_name);
+      }
+    }
+  }, [ workerId,  setValue]);
+
+  // Sync worker ID when name changes
+  useEffect(() => {
+    if (workerName) {
+      const found = contractWorkers.find((cw) => cw.company_name === workerName);
+      if (found && found.contractor_id !== workerId) {
+        setValue("contractWorker_id", found.contractor_id);
+      }
+    }
+  }, [ workerName, setValue]);
 
   const onSubmit = async (data) => {
     try {
       const payload = {
         tender_id,
-        listOfContractWorkers: [
+        workers: [
           {
             contractWorker_id: data.contractWorker_id,
             contractWorker_name: data.contractWorker_name,
@@ -40,13 +83,10 @@ const AddContractWorker = ({ onclose, onSuccess }) => {
           }
         ]
       };
-      console.log(payload);
-      
-
-    //   await axios.post(`${API}/contractworker/add`, payload);
-    //   if (onSuccess) onSuccess();
-    //   onclose();
-    //   reset();
+      await axios.post(`${API}/permittedcontractor/add`, payload);
+      if (onSuccess) onSuccess();
+      reset();
+      onclose();
     } catch (error) {
       console.error(error);
       alert("Failed to add contract worker");
@@ -63,17 +103,41 @@ const AddContractWorker = ({ onclose, onSuccess }) => {
           <div className="grid grid-cols-2 gap-5 px-6 py-6">
             <InputField
               label="Contract Worker ID"
+              type="select"
               name="contractWorker_id"
               register={register}
               errors={errors}
-              placeholder="Enter contract worker ID"
+              options={contractWorkers.map((cw) => ({
+                label: cw.contractor_id,
+                value: cw.contractor_id,
+              }))}
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                setValue("contractWorker_id", selectedId);
+                const found = contractWorkers.find((cw) => cw.contractor_id === selectedId);
+                if (found)
+                  setValue("contractWorker_name", found.company_name, { shouldValidate: true });
+              }}
             />
-             <InputField
+            <InputField
               label="Contract Worker Name"
+              type="select"
               name="contractWorker_name"
               register={register}
               errors={errors}
-              placeholder="Enter contract worker Name"
+              options={contractWorkers.map((cw) => ({
+                label: cw.company_name,
+                value: cw.company_name,
+              }))}
+              onChange={(e) => {
+                const selectedName = e.target.value;
+                setValue("contractWorker_name", selectedName);
+                const found = contractWorkers.find(
+                  (cw) => cw.company_name === selectedName
+                );
+                if (found)
+                  setValue("contractWorker_id", found.contractor_id, { shouldValidate: true });
+              }}
             />
             <InputField
               label="Contract Start Date"
@@ -110,7 +174,6 @@ const AddContractWorker = ({ onclose, onSuccess }) => {
               ]}
             />
           </div>
-
           <div className="mx-5 text-xs flex justify-end gap-2 mb-4">
             <button
               type="button"

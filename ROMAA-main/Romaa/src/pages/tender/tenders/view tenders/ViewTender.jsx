@@ -43,15 +43,15 @@ const tabs = [
 
   {
     id: "2",
-    label: "Plan",
+    label: "Project Documents",
     component: <Plan />,
     buttons: [
-      {
-        label: "Export",
-        icon: <TbFileExport size={23} />,
-        className:
-          "dark:bg-layout-dark bg-white dark:text-white text-darkest-blue",
-      },
+      // {
+      //   label: "Export",
+      //   icon: <TbFileExport size={23} />,
+      //   className:
+      //     "dark:bg-layout-dark bg-white dark:text-white text-darkest-blue",
+      // },
     ],
   },
   {
@@ -98,23 +98,23 @@ const tabs = [
       },
     ],
   },
-  {
-    id: "5",
-    label: "Project Documents",
-    component: <ProjectDocuments />,
-    buttons: [
-      {
-        label: "Upload Documents",
-        className: "bg-darkest-blue text-white",
-      },
-      {
-        label: "Export",
-        icon: <TbFileExport size={23} />,
-        className:
-          " dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
-      },
-    ],
-  },
+  // {
+  //   id: "5",
+  //   label: "Project Documents",
+  //   component: <ProjectDocuments />,
+  //   buttons: [
+  //     {
+  //       label: "Upload Documents",
+  //       className: "bg-darkest-blue text-white",
+  //     },
+  //     {
+  //       label: "Export",
+  //       icon: <TbFileExport size={23} />,
+  //       className:
+  //         " dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
+  //     },
+  //   ],
+  // },
   {
     id: "6",
     label: "EMD",

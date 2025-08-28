@@ -1,23 +1,85 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { TbFileInvoice } from "react-icons/tb";
+import AddPlan from "./AddPlan";
+import { API } from "../../../../../constant";
+import { useParams } from "react-router-dom";
 
 const Plan = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [documents, setDocuments] = useState([]);
+  const {tender_id} = useParams(); 
+
+  const handleUploadSuccess = () => {
+    setShowModal(false);
+    fetchDocuments();
+  };
+
+  const fetchDocuments = async () => {
+    try {
+      const res = await axios.get(`${API}/document/alldocuments/${tender_id}`);
+      if (res.data && res.data.tender_document) {
+        setDocuments(res.data.tender_document.documents || []);
+      } else {
+        setDocuments([]);
+      }
+    } catch (error) {
+      console.error("Error fetching documents", error);
+      setDocuments([]);
+    }
+  };
+
+  // Fetch documents on component mount
+  useEffect(() => {
+    fetchDocuments();
+  }, [tender_id]);
+
   return (
     <>
-    <div className="h-11/12">
-      <div className=" cursor-pointer flex justify-end pr-4">
-        <p className="flex items-center gap-2 bg-darkest-blue text-white px-4 py-2 rounded">
-          Upload Plan
-        </p>
-      </div>
-      <div className="flex flex-col justify-center items-center h-full  text-darkest-blue">
-        
-          <p className="flex justify-center items-center ">
-            <TbFileInvoice size={52} className="stroke-1"/>
+      <div className="h-11/12">
+        <div className="cursor-pointer flex justify-end pr-4 mb-6">
+          <p
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-darkest-blue text-white px-4 py-2 rounded select-none hover:bg-blue-800 transition"
+          >
+            Upload Plan
           </p>
-          <p className="font-semibold py-2">Upload Files</p>
-      
+        </div>
+
+       
+
+        {/* Documents Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
+          {documents.length === 0 ? (
+          
+             <div className=" col-span-full flex flex-col justify-center items-center mb-8 text-darkest-blue">
+          <TbFileInvoice size={52} className="stroke-1" />
+          <p className="font-semibold py-2">Uploaded Files</p>
+        </div>
+          ) : (
+            documents.map((doc) => (
+              <div
+                key={doc.code}
+                className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-lg transition"
+              >
+                <div>
+                  <h3 className="font-semibold text-lg truncate">{doc.filename}</h3>
+                  <p className="mt-1 text-sm text-gray-600 truncate">{doc.description || "No description"}</p>
+                </div>
+                <div className="mt-4 flex justify-between items-center text-xs text-gray-500">
+                  <span>{new Date(doc.uploaded_at).toLocaleDateString()}</span>
+                  <span>{(doc.file_url && <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View</a>) || "No file"}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
-      </div>
+
+      {/* Upload Modal */}
+      {showModal && (
+        <AddPlan onClose={() => setShowModal(false)} onUploadSuccess={handleUploadSuccess} />
+      )}
     </>
   );
 };

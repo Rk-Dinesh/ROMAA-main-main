@@ -12,9 +12,9 @@ import { toast } from "react-toastify";
 const customerColumns = [
   { label: "Vendor ID", key: "vendor_id" },
   { label: "Vendor Name", key: "vendor_name" },
-  { label: "Vendor Type", key: "vendor" },
-  { label: "Address", key: "address" },
-  { label: "GSTIN", key: "permitted_status" },
+  { label: "Vendor Type", key: "type" },
+  //{ label: "Address", key: "address" },
+  { label: "Status", key: "permitted_status" },
 ];
 
 const Vendor = () => {
