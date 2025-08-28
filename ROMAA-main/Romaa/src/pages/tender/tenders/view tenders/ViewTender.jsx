@@ -290,7 +290,7 @@ const ViewTender = () => {
           <div className=" cursor-pointer place-self-end  items-center  flex justify-end ">
             <p
               onClick={() => navigate("..")}
-              className="flex items-center gap-2 bg-darkest-blue text-white px-8 py-2 rounded"
+              className="flex items-center gap-2 bg-darkest-blue text-white px-8 py-2 mt-2 rounded"
             >
               <MdArrowBackIosNew />
               Back

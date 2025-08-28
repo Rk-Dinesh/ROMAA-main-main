@@ -6,6 +6,7 @@ import { IoMdSave } from "react-icons/io";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { API } from "../../../../../constant";
+import TenderProcessStepper from "./TenderProcessStepper";
 
 const tenderProcessDataTemplate = [
   { label: "Site Investigation", key: "site_investigation" },
@@ -17,24 +18,21 @@ const tenderProcessDataTemplate = [
   { label: "Work Order", key: "work_order" },
   { label: "Agreement", key: "agreement" },
 ];
+
 const TenderOverView = () => {
   const { tender_id } = useParams();
   const [addFollowup, setAddFollowup] = useState(false);
 
-  const [importantDates, setImportantDates] = useState([]);
   const [customerDetails, setCustomerDetails] = useState([]);
   const [tenderDetailsState, setTenderDetailsState] = useState([]);
   const [tenderProcessState, setTenderProcessState] = useState([]);
 
   const [isEditingTender, setIsEditingTender] = useState(false);
-  const [isProcessChanged, setIsProcessChanged] = useState(false);
 
   const fetchTenderOverview = async () => {
     try {
       const res = await axios.get(`${API}/tender/getoverview/${tender_id}`);
       const data = res.data.data;
-
-      setImportantDates(data.importantDates || []);
 
       setCustomerDetails([
         { label: "Customer ID", value: data.customerDetails?.client_id },
@@ -42,7 +40,7 @@ const TenderOverView = () => {
         { label: "PAN no", value: data.customerDetails?.pan_no },
         { label: "CIN no", value: data.customerDetails?.cin_no },
         { label: "GSTIN", value: data.customerDetails?.gstin },
-      //  { label: "VAT no", value: "Infrastructure" },
+        //  { label: "VAT no", value: "Infrastructure" },
         { label: "Phone Number", value: data.customerDetails?.contact_phone },
         { label: "Email ID", value: data.customerDetails?.contact_email },
         {
@@ -77,7 +75,10 @@ const TenderOverView = () => {
         { label: "Contact Person", value: data.tenderDetails?.contact_person },
         { label: "Contact Number", value: data.tenderDetails?.contact_phone },
         { label: "Email ID", value: data.tenderDetails?.contact_email },
-        {label: "Tender Value", value: data.tenderDetails?.tender_value || "-"},
+        {
+          label: "Tender Value",
+          value: data.tenderDetails?.tender_value || "-",
+        },
       ]);
 
       setTenderProcessState(
@@ -92,8 +93,32 @@ const TenderOverView = () => {
     }
   };
 
+  const fetchProcessData = async () => {
+    try {
+      const res = await axios.get(`${API}/tender/process/${tender_id}`);
+      const savedData = res.data?.processData || [];
+
+      const initialData = tenderProcessDataTemplate.map((step) => {
+        const savedStep = savedData.find((d) => d.key === step.key);
+        return {
+          ...step,
+          notes: savedStep?.notes || "",
+          date: savedStep?.date || "",
+          time: savedStep?.time || "",
+          completed: savedStep?.completed === true,
+          file_name: savedStep?.file_name || "",
+          file_url: savedStep?.file_url || "",
+        };
+      });
+      setTenderProcessState(initialData);
+    } catch (error) {
+      console.error("Error fetching process data:", error);
+    }
+  };
+
   useEffect(() => {
     if (tender_id) fetchTenderOverview();
+   fetchProcessData();
   }, [tender_id]);
 
   const handleCancel = () => {
@@ -111,95 +136,15 @@ const TenderOverView = () => {
     );
   };
 
-  const handleCheckboxChange = (idx) => {
-    setTenderProcessState((prev) =>
-      prev.map((item, i) =>
-        i === idx ? { ...item, checked: !item.checked } : item
-      )
-    );
-    setIsProcessChanged(true);
-  };
-
-  const handleProcessSave = async () => {
-    try {
-      const processStatus = {};
-      tenderProcessState.forEach((item) => {
-        processStatus[item.key] = !!item.checked;
-      });
-
-      console.log(processStatus);
-
-      const res = await axios.put(
-        `${API}/tender/statuscheck/${tender_id}`,
-        processStatus
-      );
-
-      console.log(res);
-
-      setIsProcessChanged(false);
-      console.log("Process status saved successfully.");
-    } catch (error) {
-      console.error("Error saving process status:", error);
-      alert("Failed to save process status. Please try again.");
-    }
+    const handleUploadSuccess = () => {
+    fetchProcessData();
   };
 
   return (
     <>
-      <div className="font-roboto-flex grid grid-cols-12 h-full gap-4  overflow-y-auto no-scrollbar py-2">
-        <div className="col-span-4 row-span-2 dark:bg-layout-dark bg-white rounded-lg shadow p-4 space-y-4">
-          <div className="flex justify-between items-center pb-4 mt-2">
-            <p className="font-semibold text-lg">Important Dates</p>
-            <button
-              onClick={() => setAddFollowup(true)}
-              className="bg-darkest-blue px-3 py-1.5 text-xs font-extralight text-white rounded"
-            >
-              Add Follow up
-            </button>
-          </div>
-          <div className="space-y-3 px-2">
-            {importantDates.map((item, index) => (
-              <div key={index} className="space-y-1 ">
-                <p className="font-semibold text-sm">{item.title}</p>
-                <div className="grid grid-cols-12 mx-4 text-xs gap-1 ">
-                  <p className="col-span-4">Date</p>
-                  <p className="col-span-8 text-end text-gray-500">
-                    {item.date}
-                  </p>
-                  <p className="col-span-4">Time</p>
-                  <p className="col-span-8 text-end text-gray-500">
-                    {item.time || "-"}
-                  </p>
-                  {item.notes && (
-                    <>
-                      <p className="col-span-4 ">Notes</p>
-                      <p className="col-span-8 text-end text-gray-500">
-                        {item.notes}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="col-span-4 dark:bg-layout-dark bg-white rounded-lg shadow p-4">
-          <div className="flex justify-between items-center px-2 py-2">
-            <p className="font-semibold text-lg">Customer Details</p>
-          </div>
-          <div className="grid grid-cols-12 gap-2  text-xs font-semibold px-2 py-2 ">
-            {customerDetails.map((item, index) => (
-              <React.Fragment key={index}>
-                <p className="col-span-6">{item.label}</p>
-                <p className="col-span-6 text-end  opacity-50 font-light">
-                  {item.value}
-                </p>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-        <div className="col-span-4 dark:bg-layout-dark bg-white rounded-lg shadow p-4">
+      <div className="font-roboto-flex grid grid-cols-12 h-full gap-3  overflow-y-auto no-scrollbar py-2">
+       
+        <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4">
           {" "}
           <div className="flex justify-between items-center px-2 py-2">
             <p className="font-semibold text-lg">Tender Details</p>
@@ -249,37 +194,76 @@ const TenderOverView = () => {
             </div>
           )}
         </div>
-        <div className="col-span-8 dark:bg-layout-dark bg-white rounded-lg shadow p-4 ">
-          <div className="flex justify-between items-center">
-            <p className="font-semibold text-sm py-2 mx-4">Tender Process</p>
-
-            {isProcessChanged && (
-              <button
-                className="ml-2 text-white bg-darkest-blue px-2.5 py-1 rounded"
-                onClick={handleProcessSave}
-              >
-                <IoMdSave size={18} />
-              </button>
-            )}
+         <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4">
+          <div className="flex justify-between items-center px-2 py-2">
+            <p className="font-semibold text-lg">Customer Details</p>
           </div>
-          <div className="space-y-1 mx-4 text-sm">
-            {tenderProcessState.map((item, index) => (
-              <div key={index} className="flex justify-between items-center ">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    className="form-checkbox rounded text-darkest-blue"
-                    checked={item.checked}
-                    onChange={() => handleCheckboxChange(index)}
-                  />
-                  <span>{item.label}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-xs">{item.date}</span>
-                </div>
-              </div>
+          <div className="grid grid-cols-12 gap-2  text-xs font-semibold px-2 py-2 ">
+            {customerDetails.map((item, index) => (
+              <React.Fragment key={index}>
+                <p className="col-span-6">{item.label}</p>
+                <p className="col-span-6 text-end  opacity-50 font-light">
+                  {item.value}
+                </p>
+              </React.Fragment>
             ))}
           </div>
+        </div>
+        <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4 ">
+          <TenderProcessStepper onUploadSuccess={handleUploadSuccess}/>
+        </div>
+         <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4 ">
+          {/* <TenderProcessStepper /> */}
+        </div>
+
+        <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4 space-y-4">
+          <p className="font-semibold text-lg mb-4">Tender Process Overview</p>
+
+          {tenderProcessState.filter((step) => step.completed).length === 0 ? (
+            <p className="text-center text-gray-500">
+              No tender process data available.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {tenderProcessState
+                .filter((step) => step.completed) 
+                .map((step, idx) => (
+                  <div
+                    key={step.key}
+                    className={`p-4 rounded border border-green-500 bg-green-50 dark:bg-green-900`}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-semibold">
+                        {idx + 1}. {step.label}
+                      </h4>
+                      <span className="text-xs font-semibold px-2 py-1 rounded bg-green-600 text-white">
+                        Completed
+                      </span>
+                    </div>
+                    <p className="text-sm mb-1">
+                      <strong>Date:</strong>{" "}
+                      {step.date
+                        ? new Date(step.date).toLocaleDateString()
+                        : "-"}
+                    </p>
+                    <p className="text-sm mb-1">
+                      <strong>Time:</strong> {step.time || "-"}
+                    </p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      <strong>Notes:</strong> {step.notes || "-"}
+                    </p>
+                     <p> <strong>File:</strong> {(step.file_name && <a href={step.file_url} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">{step.file_name}</a>) || "No file"}</p>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        <div className="col-span-6 row-span-0 dark:bg-layout-dark bg-white rounded-lg shadow p-4 space-y-2">
+          <div className="flex justify-between items-center pb-4 mt-2">
+            <p className="font-semibold text-lg">Important Dates</p>
+          </div>
+          <div className="space-y-3 px-2"></div>
         </div>
       </div>
       {addFollowup && (

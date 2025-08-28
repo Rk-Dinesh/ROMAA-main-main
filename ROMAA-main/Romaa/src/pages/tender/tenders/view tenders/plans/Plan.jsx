@@ -20,6 +20,8 @@ const Plan = () => {
       const res = await axios.get(`${API}/document/alldocuments/${tender_id}`);
       if (res.data && res.data.tender_document) {
         setDocuments(res.data.tender_document.documents || []);
+        console.log(res.data.tender_document.documents);
+        
       } else {
         setDocuments([]);
       }
@@ -36,7 +38,7 @@ const Plan = () => {
 
   return (
     <>
-      <div className="h-11/12">
+      <div className="h-11/12 overflow-auto">
         <div className="cursor-pointer flex justify-end pr-4 mb-6">
           <p
             onClick={() => setShowModal(true)}
@@ -49,7 +51,7 @@ const Plan = () => {
        
 
         {/* Documents Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-4">
           {documents.length === 0 ? (
           
              <div className=" col-span-full flex flex-col justify-center items-center mb-8 text-darkest-blue">
@@ -60,15 +62,15 @@ const Plan = () => {
             documents.map((doc) => (
               <div
                 key={doc.code}
-                className="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-lg transition"
+                className="bg-white dark:bg-darkest-blue dark:text-white text-darkest-blue rounded-lg shadow-md p-4 flex flex-col justify-between hover:shadow-lg transition"
               >
-                <div>
-                  <h3 className="font-semibold text-lg truncate">{doc.filename}</h3>
-                  <p className="mt-1 text-sm text-gray-600 truncate">{doc.description || "No description"}</p>
+                <div className="dark:text-white text-darkest-blue">
+                  <h3 className="font-semibold text-lg truncate ">{doc.filename}</h3>
+                  {/* <p className="mt-1 text-sm  truncate">{doc.description || "No description"}</p> */}
                 </div>
-                <div className="mt-4 flex justify-between items-center text-xs text-gray-500">
+                <div className="mt-4 flex justify-between items-center text-xs ">
                   <span>{new Date(doc.uploaded_at).toLocaleDateString()}</span>
-                  <span>{(doc.file_url && <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View</a>) || "No file"}</span>
+                  <span>{(doc.file_url && <a href={doc.file_url} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">View</a>) || "No file"}</span>
                 </div>
               </div>
             ))
