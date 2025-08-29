@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { API } from "../../../../../constant";
 import TenderProcessStepper from "./TenderProcessStepper";
+import PreliminaryProcessStepper from "./PreliminaryProcessStepper";
 
 const tenderProcessDataTemplate = [
   { label: "Site Investigation", key: "site_investigation" },
@@ -19,6 +20,38 @@ const tenderProcessDataTemplate = [
   { label: "Agreement", key: "agreement" },
 ];
 
+const preliminarySiteWorkTemplate = [
+  { label: "Site Visit & Reconnaissance", key: "site_visit_reconnaissance" },
+  {
+    label: "Site Approach & Accessibility",
+    key: "site_approach_accessibility",
+  },
+  { label: "Site Hurdles Identification", key: "site_hurdles_identification" },
+  {
+    label: "Labour Shed Location and Feasibility",
+    key: "labour_shed_location_feasibility",
+  },
+  { label: "Temporary EB Connection", key: "temporary_eb_connection" },
+  {
+    label: "Water Source Identification & Connection",
+    key: "water_source_identification_connection",
+  },
+  {
+    label: "Office, Labour and Materials Shed Setup",
+    key: "office_labour_materials_shed_setup",
+  },
+  {
+    label: "Yard for Steel and Bulk Materials",
+    key: "yard_steel_bulk_materials",
+  },
+  { label: "Office Setup & Facilities", key: "office_setup_facilities" },
+  {
+    label: "Sub Contractors Identification",
+    key: "sub_contractors_identification",
+  },
+  { label: "Vendor Identification", key: "vendor_identification" },
+];
+
 const TenderOverView = () => {
   const { tender_id } = useParams();
   const [addFollowup, setAddFollowup] = useState(false);
@@ -26,6 +59,7 @@ const TenderOverView = () => {
   const [customerDetails, setCustomerDetails] = useState([]);
   const [tenderDetailsState, setTenderDetailsState] = useState([]);
   const [tenderProcessState, setTenderProcessState] = useState([]);
+  const [tenderPreliminary, setTenderPreliminary] = useState([]);
 
   const [isEditingTender, setIsEditingTender] = useState(false);
 
@@ -116,9 +150,33 @@ const TenderOverView = () => {
     }
   };
 
+   const fetchPreliminaryData = async () => {
+    try {
+      const res = await axios.get(`${API}/tender/preliminary/${tender_id}`);
+      const savedData = res.data?.processData || [];
+
+      const initialData = preliminarySiteWorkTemplate.map((step) => {
+        const savedStep = savedData.find((d) => d.key === step.key);
+        return {
+          ...step,
+          notes: savedStep?.notes || "",
+          date: savedStep?.date || "",
+          time: savedStep?.time || "",
+          completed: savedStep?.completed === true,
+          file_name: savedStep?.file_name || "",
+          file_url: savedStep?.file_url || "",
+        };
+      });
+      setTenderPreliminary(initialData);
+    } catch (error) {
+      console.error("Error fetching process data:", error);
+    }
+  };
+
   useEffect(() => {
     if (tender_id) fetchTenderOverview();
    fetchProcessData();
+    fetchPreliminaryData();
   }, [tender_id]);
 
   const handleCancel = () => {
@@ -138,6 +196,10 @@ const TenderOverView = () => {
 
     const handleUploadSuccess = () => {
     fetchProcessData();
+  };
+
+  const handleUploadSuccessPreliminary = () => {
+    fetchPreliminaryData();
   };
 
   return (
@@ -213,7 +275,7 @@ const TenderOverView = () => {
           <TenderProcessStepper onUploadSuccess={handleUploadSuccess}/>
         </div>
          <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4 ">
-          {/* <TenderProcessStepper /> */}
+          <PreliminaryProcessStepper onUploadSuccess={handleUploadSuccessPreliminary} />
         </div>
 
         <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4 space-y-4">
@@ -259,12 +321,50 @@ const TenderOverView = () => {
           )}
         </div>
 
-        <div className="col-span-6 row-span-0 dark:bg-layout-dark bg-white rounded-lg shadow p-4 space-y-2">
-          <div className="flex justify-between items-center pb-4 mt-2">
-            <p className="font-semibold text-lg">Important Dates</p>
-          </div>
-          <div className="space-y-3 px-2"></div>
+         <div className="col-span-6 dark:bg-layout-dark bg-white rounded-lg shadow p-4 space-y-4">
+          <p className="font-semibold text-lg mb-4">Preliminary Process Overview</p>
+
+          {tenderPreliminary.filter((step) => step.completed).length === 0 ? (
+            <p className="text-center text-gray-500">
+              No tender process data available.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {tenderPreliminary
+                .filter((step) => step.completed) 
+                .map((step, idx) => (
+                  <div
+                    key={step.key}
+                    className={`p-4 rounded border border-green-500 bg-green-50 dark:bg-green-900`}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-semibold">
+                        {idx + 1}. {step.label}
+                      </h4>
+                      <span className="text-xs font-semibold px-2 py-1 rounded bg-green-600 text-white">
+                        Completed
+                      </span>
+                    </div>
+                    <p className="text-sm mb-1">
+                      <strong>Date:</strong>{" "}
+                      {step.date
+                        ? new Date(step.date).toLocaleDateString()
+                        : "-"}
+                    </p>
+                    <p className="text-sm mb-1">
+                      <strong>Time:</strong> {step.time || "-"}
+                    </p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      <strong>Notes:</strong> {step.notes || "-"}
+                    </p>
+                     <p> <strong>File:</strong> {(step.file_name && <a href={step.file_url} target="_blank" rel="noopener noreferrer" className="text-white hover:underline">{step.file_name}</a>) || "No file"}</p>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
+
+       
       </div>
       {addFollowup && (
         <AddFollowUp

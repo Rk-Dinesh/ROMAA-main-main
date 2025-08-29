@@ -8,15 +8,36 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-const tenderProcessDataTemplate = [
-  { label: "Site Investigation", key: "site_investigation" },
-  { label: "Pre bid Meeting", key: "pre_bid_meeting" },
-  { label: "Bid Submit", key: "bid_submission" },
-  { label: "Technical Bid Opening", key: "technical_bid_opening" },
-  { label: "Commercial Bid Opening", key: "commercial_bid_opening" },
-  { label: "Negotiations", key: "negotiation" },
-  { label: "Work Order", key: "work_order" },
-  { label: "Agreement", key: "agreement" },
+const preliminarySiteWorkTemplate = [
+  { label: "Site Visit & Reconnaissance", key: "site_visit_reconnaissance" },
+  {
+    label: "Site Approach & Accessibility",
+    key: "site_approach_accessibility",
+  },
+  { label: "Site Hurdles Identification", key: "site_hurdles_identification" },
+  {
+    label: "Labour Shed Location and Feasibility",
+    key: "labour_shed_location_feasibility",
+  },
+  { label: "Temporary EB Connection", key: "temporary_eb_connection" },
+  {
+    label: "Water Source Identification & Connection",
+    key: "water_source_identification_connection",
+  },
+  {
+    label: "Office, Labour and Materials Shed Setup",
+    key: "office_labour_materials_shed_setup",
+  },
+  {
+    label: "Yard for Steel and Bulk Materials",
+    key: "yard_steel_bulk_materials",
+  },
+  { label: "Office Setup & Facilities", key: "office_setup_facilities" },
+  {
+    label: "Sub Contractors Identification",
+    key: "sub_contractors_identification",
+  },
+  { label: "Vendor Identification", key: "vendor_identification" },
 ];
 
 // Yup validation schema for the current step
@@ -27,7 +48,7 @@ const getStepSchema = () =>
     time: yup.string().required("Time is required"),
   });
 
-const TenderProcessStepper = ({onUploadSuccess}) => {
+const PreliminaryProcessStepper = ({onUploadSuccess}) => {
   const { tender_id } = useParams();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -49,10 +70,10 @@ const TenderProcessStepper = ({onUploadSuccess}) => {
     const fetchSavedProgress = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${API}/tender/process/${tender_id}`);
+        const res = await axios.get(`${API}/tender/preliminary/${tender_id}`);
         const savedData = res.data?.processData || [];
 
-        const initialData = tenderProcessDataTemplate.map((step) => {
+        const initialData = preliminarySiteWorkTemplate.map((step) => {
           const savedStep = savedData.find((d) => d.key === step.key);
           return {
             ...step,
@@ -82,7 +103,7 @@ const TenderProcessStepper = ({onUploadSuccess}) => {
         setFile(null);
       } catch (err) {
         console.error("Error fetching tender process data:", err);
-        const freshData = tenderProcessDataTemplate.map((step) => ({
+        const freshData = preliminarySiteWorkTemplate.map((step) => ({
           ...step,
           notes: "",
           date: "",
@@ -136,7 +157,7 @@ const TenderProcessStepper = ({onUploadSuccess}) => {
         formData.append("time", data.time);
         formData.append("file", file);
 
-        await axios.post(`${API}/tender/processaws/step`, formData, {
+        await axios.post(`${API}/tender/preliminaryaws/step`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
@@ -147,7 +168,7 @@ const TenderProcessStepper = ({onUploadSuccess}) => {
           date: data.date,
           time: data.time,
         };
-        await axios.post(`${API}/tender/process/step`, payload);
+        await axios.post(`${API}/tender/preliminary/step`, payload);
       }
 
       setProcessData((prev) =>
@@ -196,7 +217,7 @@ const TenderProcessStepper = ({onUploadSuccess}) => {
 
   return (
     <div className="max-w-3xl mx-auto p-3 rounded-lg select-none">
-       <p className="font-semibold text-lg mb-4">Tender Process Overview</p>
+        <p className="font-semibold text-lg   mb-4">Preliminary Process Overview</p>
       {/* Stepper Header */}
       <div className="flex flex-wrap justify-between mb-10 gap-4 max-w-4xl mx-auto">
         {processData.map((s, i) => {
@@ -349,4 +370,4 @@ const TenderProcessStepper = ({onUploadSuccess}) => {
   );
 };
 
-export default TenderProcessStepper;
+export default PreliminaryProcessStepper;
