@@ -14,33 +14,33 @@ const tabs = [
     label: "Work Order Overview",
     component: <WorkOrderOverview />,
     buttons: [
-      {
-        label: "Export",
-        icon: <TbFileExport size={23} />,
-        className: "dark:bg-layout-dark dark:text-white bg-white text-darkest-blue",
-      },
-      {
-        label: "Filter",
-        icon: <TbFilter size={23} />,
-        className: " dark:bg-layout-dark dark:text-white  bg-white text-darkest-blue",
-      },
+      // {
+      //   label: "Export",
+      //   icon: <TbFileExport size={23} />,
+      //   className: "dark:bg-layout-dark dark:text-white bg-white text-darkest-blue",
+      // },
+      // {
+      //   label: "Filter",
+      //   icon: <TbFilter size={23} />,
+      //   className: " dark:bg-layout-dark dark:text-white  bg-white text-darkest-blue",
+      // },
     ],
   },
   {
     id: "2",
-    label: "BOQ",
+    label: "Zero Cost BOQ",
     component: <BoqWorkOrder />,
     buttons: [
-      {
-        label: "Export",
-        icon: <TbFileExport size={23} />,
-        className: "dark:bg-layout-dark dark:text-white  bg-white text-darkest-blue",
-      },
-      {
-        label: "Filter",
-        icon: <TbFilter size={23} />,
-        className: " dark:bg-layout-dark dark:text-white bg-white text-darkest-blue",
-      },
+      // {
+      //   label: "Export",
+      //   icon: <TbFileExport size={23} />,
+      //   className: "dark:bg-layout-dark dark:text-white  bg-white text-darkest-blue",
+      // },
+      // {
+      //   label: "Filter",
+      //   icon: <TbFilter size={23} />,
+      //   className: " dark:bg-layout-dark dark:text-white bg-white text-darkest-blue",
+      // },
     ],
   },
   {
@@ -48,10 +48,10 @@ const tabs = [
     label: "Assets",
     component: <WorkOrderAssets />,
     buttons: [
-      {
-        label: "Upload Assets",
-        className: "bg-darkest-blue text-white",
-      },
+      // {
+      //   label: "Upload Assets",
+      //   className: "bg-darkest-blue text-white",
+      // },
 
       {
         label: "Export",

@@ -20,6 +20,7 @@ import UploadModal from "./project documents/UploadModal";
 import AddEMD from "./Emd/AddEMD";
 import axios from "axios";
 import { API } from "../../../../constant";
+import Penalities from "./Penalties/Penalities";
 
 const tabs = [
   {
@@ -149,6 +150,19 @@ const tabs = [
     id: "7",
     label: "Contract",
     component: <Contract />,
+    buttons: [
+      {
+        label: "Export",
+        icon: <TbFileExport size={23} />,
+        className:
+          "dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
+      },
+    ],
+  },
+    {
+    id: "9",
+    label: "Penalties",
+    component: <Penalities />,
     buttons: [
       {
         label: "Export",

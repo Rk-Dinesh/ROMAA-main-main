@@ -182,7 +182,7 @@ const AppRoutes = () => {
               </Route>
               <Route path="workorders">
                 <Route index element={<WorkOrder />} />
-                <Route path="viewworkorder/:tender_id">
+                <Route path="viewworkorder/:tender_id/:workOrder_id">
                   <Route index element={<ViewWorkOrder />} />
                   <Route
                     path="viewworkordertable"

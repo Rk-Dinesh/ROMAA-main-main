@@ -74,6 +74,7 @@ const WorkOrder = () => {
       routepoint={"viewworkorder"}
       FilterModal={Filters}
       idKey='tender_id'
+      id2Key='workOrder_id'
     />
   );
 };

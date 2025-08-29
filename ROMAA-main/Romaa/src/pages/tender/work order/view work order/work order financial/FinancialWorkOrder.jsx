@@ -5,6 +5,7 @@ import Deposit from "./deposit/Deposit";
 import Button from "../../../../../components/Button";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import PriceEscalation from "../terms & conditons/tabs/PriceEscalation";
 
 
 const tabs = [
@@ -20,8 +21,8 @@ const tabs = [
   },
   {
     id: "3",
-    label: "Deposit",
-    component:<Deposit/>,
+    label: "Price Escalation",
+    component:<PriceEscalation/>,
   },
 ];
 

@@ -12,11 +12,11 @@ import { useNavigate } from "react-router-dom";
 
 
 const tabs = [
-  {
-    id: "1",
-    label: "Price Escalation",
-    component:<PriceEscalation/>,
-  },
+  // {
+  //   id: "1",
+  //   label: "Price Escalation",
+  //   component:<PriceEscalation/>,
+  // },
   {
     id: "2",
     label: "Client Supply Materails",

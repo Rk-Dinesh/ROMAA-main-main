@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API } from '../../../../../constant';
 import { toast } from 'react-toastify';
+import Filters from '../../../../../components/Filters';
 
 const WorkOrderBOQColumns = [
   { label: "Specification", key: "description" },
@@ -66,13 +67,14 @@ const BoqWorkOrder = () => {
     contentMarginTop='mt-0'
       endpoint={items}
       columns={WorkOrderBOQColumns}
-      EditModal={true}
+      //EditModal={true}
       ViewModal={ViewWorkOrderBoq}
       exportModal={false}
       DeleteModal={DeleteModal}
       deletetitle="BOQ"
       totalPages={totalPages}
       currentPage={currentPage}
+      FilterModal={Filters}
       setCurrentPage={setCurrentPage}
       onUpdated={fetchBoqItems}
       onSuccess={fetchBoqItems}

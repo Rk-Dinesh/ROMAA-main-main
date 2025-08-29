@@ -43,7 +43,7 @@ const Table = ({
   onSuccess,
   onDelete,
   idKey,
-  
+  id2Key,
 }) => {
   const navigate = useNavigate();
   const { searchTerm } = useSearch();
@@ -291,7 +291,7 @@ const Table = ({
                           <button
                             onClick={() => {
                               if (routepoint) {
-                                // persist the selected item in localStorage
+                                // Persist the selected item in localStorage if idKey is present
                                 if (idKey) {
                                   localStorage.setItem(
                                     `selected${idKey}`,
@@ -299,25 +299,35 @@ const Table = ({
                                   );
                                 }
 
-                                // Check if routepoint expects a param
-                                if (idKey && routepoint.includes(":")) {
-                                  // routepoint is something like "/viewvendor/:vendorId"
+                                // Navigate based on presence of idKey and id2Key and routepoint param placeholder
+                                if (idKey && id2Key) {
+                                  // If have two keys, navigate with both params appended
+                                  navigate(
+                                    `${routepoint}/${item[idKey]}/${item[id2Key]}`,
+                                    { state: { item } }
+                                  );
+                                } else if (
+                                  idKey &&
+                                  routepoint.includes(`:${idKey}`)
+                                ) {
+                                  // If routepoint contains param placeholder ":idKey", replace it
                                   const url = routepoint.replace(
                                     `:${idKey}`,
                                     item[idKey]
                                   );
                                   navigate(url, { state: { item } });
                                 } else if (idKey) {
-                                  // routepoint might be e.g. "/viewvendor" but you *want* to append ID anyway
+                                  // Otherwise append idKey param manually
                                   navigate(`${routepoint}/${item[idKey]}`, {
                                     state: { item },
                                   });
                                 } else {
-                                  // route has no params, just navigate with state
+                                  // No params, just navigate with state
                                   navigate(routepoint, { state: { item } });
                                 }
                               }
 
+                              // Handle modal view toggle state based on ViewModal prop
                               if (ViewModal === true) {
                                 setShowView(false);
                               } else {
@@ -403,7 +413,7 @@ const Table = ({
           onFilter={handleFilter}
         />
       )}
-       {UploadModal && showUpload && (
+      {UploadModal && showUpload && (
         <UploadModal
           onclose={() => setShowUpload(false)}
           onSuccess={onSuccess}

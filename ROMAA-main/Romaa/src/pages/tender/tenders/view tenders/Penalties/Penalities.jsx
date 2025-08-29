@@ -1,29 +1,27 @@
 import { LuUserRoundSearch } from "react-icons/lu";
 import DeleteModal from "../../../../../components/DeleteModal";
 import Table from "../../../../../components/Table";
-import AddContractWorker from "./AddContract";
 import axios from "axios";
 import { API } from "../../../../../constant";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import AddPenalty from "./AddPenalities";
 
-const customerColumns = [
-  { label: "Contractor_id", key: "contractWorker_id" },
-  { label: "Company Name", key: "contractWorker_name" },
-  { label: "Contract Start", key: "contractStart_date" ,
-     render: (item) => item.contractStart_date ? new Date(item.contractStart_date).toLocaleDateString() : "-"
+const penaltyColumns = [
+  { label: "Penalty_id", key: "penalty_id" },
+  { label: "Penalty Type", key: "penalty_type" },
+  { label: "Penalty Amount", key: "penalty_amount" },
+  { label: "Penalty Date", key: "penalty_date" ,
+    render: (item) => item.penalty_date ? new Date(item.penalty_date).toLocaleDateString() : "-"
   },
-  { label: "End Date", key: "contractEnd_date" ,
-     render: (item) => item.contractEnd_date ? new Date(item.contractEnd_date).toLocaleDateString() : "-"
-  },
-  { label: "Site", key: "contratctSite" },
-  { label: "Status", key: "contractStatus" },
+  { label: "Description", key: "description" },
+  { label: "Status", key: "status" },
 ];
 
-const Contract = () => {
+const Penalities = () => {
   const { tender_id } = useParams(); 
-  const [contracts, setContracts] = useState([]);
+  const [penalty, setPenalty] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,11 +31,11 @@ const Contract = () => {
     todate: "",
   });
 
-  // Fetch contracts list
-  const fetchContracts = async () => {
+  // Fetch penalty list
+  const fetchPenalty = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/permittedcontractor/permitted-contractor/${tender_id}`, {
+      const res = await axios.get(`${API}/penalty/penalties/${tender_id}`, {
         params: {
           page: currentPage,
           limit: 10,
@@ -47,29 +45,29 @@ const Contract = () => {
         },
       });
 
-      setContracts(res.data.data);
+      setPenalty(res.data.data);
       console.log(res.data.data);
       
       setTotalPages(res.data.totalPages);
     } catch (err) {
-      toast.error("Failed to fetch contracts");
+      toast.error("Failed to fetch penalty");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchContracts();
+    fetchPenalty();
   }, [currentPage, searchTerm, filterParams]);
 
   // Handle delete contract
-  const handleDeleteContract = async (contract_id) => {
+  const handleDeletePenalty = async (penalty_id) => {
     try {
-      await axios.delete(`${API}/permittedcontractor/remove/${tender_id}/${contract_id}`);
+      await axios.delete(`${API}/penalty/remove/${tender_id}/${penalty_id}`);
       toast.success("Contract was successfully removed!");
-      fetchContracts();
+      fetchPenalty();
     } catch (error) {
-      toast.error("Failed to remove contract.");
+      toast.error("Failed to remove penalty.");
     }
   };
 
@@ -77,27 +75,27 @@ const Contract = () => {
     <>
       <Table
         contentMarginTop="mt-0"
-        endpoint={contracts}
-        columns={customerColumns}
+        endpoint={penalty}
+        columns={penaltyColumns}
         ViewModal={true}
-        AddModal={AddContractWorker}
-        addButtonLabel="Add Contractor"
+        AddModal={AddPenalty}
+        addButtonLabel="Add Penalty"
         addButtonIcon={<LuUserRoundSearch size={24} />}
         exportModal={false}
         DeleteModal={DeleteModal}
-        deletetitle="Contract"
+        deletetitle="Penalty"
         totalPages={totalPages}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         filterParams={filterParams}
         setFilterParams={setFilterParams}
-        onUpdated={fetchContracts}
-        onSuccess={fetchContracts}
-        onDelete={handleDeleteContract}
-        idKey="contractWorker_id" 
+        onUpdated={fetchPenalty}
+        onSuccess={fetchPenalty}
+        onDelete={handleDeletePenalty}
+        idKey="penalty_id" 
       />
     </>
   );
 };
 
-export default Contract;
+export default Penalities;

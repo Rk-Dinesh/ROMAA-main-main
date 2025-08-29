@@ -3,20 +3,22 @@ import Modal from "../../../../../components/Modal";
 import { useNavigate } from "react-router-dom";
 
 const BOQ_FIELDS = [
-  { label: "Ref no", key: "refno" },
+  { label: "Ref no", key: "item_code" },
+  { label: "Material", key: "item_name" },
   { label: "Unit", key: "unit" },
   { label: "Quantity", key: "quantity" },
-  { label: "Base Rate", key: "baserate" },
-  { label: "Quoted Rate", key: "quotedrate", isRupee: true },
-  { label: "WO Rate", key: "worate", isRupee: true },
-  { label: "Amount", key: "amount", isRupee: true },
-  { label: "Specification", key: "specification" },
+  { label: "Base Rate", key: "zero_cost_unit_rate" },
+  // { label: "Quoted Rate", key: "quotedrate", isRupee: true },
+  // { label: "WO Rate", key: "worate", isRupee: true },
+  { label: "Amount", key: "zero_cost_final_amount", isRupee: true },
+  {label:"Remarks",key:"remarks"},
+  { label: "Specification", key: "description" },
 ];
 
-const ViewWorkOrderBoq = ({ onclose, boq }) => {
+const ViewWorkOrderBoq = ({ onclose, item }) => {
 
   const navigate = useNavigate();
-  const data = boq || {
+  const data = item || {
     refno: "#2345",
     unit: "33ABCDE4567F8Z9",
     quantity: 80,
@@ -29,7 +31,7 @@ const ViewWorkOrderBoq = ({ onclose, boq }) => {
 
   return (
     <Modal
-      title="BOQ (Bill Of Quantity)"
+      title="Zero Cost BOQ Item Details"
       widthClassName="lg:w-[420px] md:w-[400px] w-96"
       onclose={onclose}
       child={
