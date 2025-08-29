@@ -29,18 +29,18 @@ const TenderColumns = [
   {
     label: "Status",
     key: "tender_status",
-    render: (item) => {
-      let colorClass = "text-gray-700"; // default
-      if (item.tender_status === "APPROVED") colorClass = "text-green-600";
-      else if (item.tender_status === "REJECTED") colorClass = "text-red-600";
-      else if (item.tender_status === "PENDING") colorClass = "text-blue-600 " ;
+    // render: (item) => {
+    //   let colorClass = "text-gray-700"; // default
+    //   if (item.tender_status === "APPROVED") colorClass = "text-green-600";
+    //   else if (item.tender_status === "REJECTED") colorClass = "text-red-600";
+    //   else if (item.tender_status === "PENDING") colorClass = "text-blue-600 " ;
 
-      return (
-        <span className={colorClass}>
-          {item.tender_status?.charAt(0).toUpperCase() + item.tender_status?.slice(1).toLowerCase() || "-"}
-        </span>
-      );
-    }
+    //   return (
+    //     <span className={colorClass}>
+    //       {item.tender_status?.charAt(0).toUpperCase() + item.tender_status?.slice(1).toLowerCase() || "-"}
+    //     </span>
+    //   );
+    // }
   }
 ];
 

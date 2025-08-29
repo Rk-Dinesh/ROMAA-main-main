@@ -156,6 +156,7 @@ import ViewManPowerHistogram from "../pages/projects/schedule/schedule/tabs/Man 
 import ViewMechinerySchedule from "../pages/projects/schedule/schedule/tabs/machinery Schedule/ViewMechinerySchedule";
 import EditContractor from "../pages/Hr/contract & Nmr/EditContractor";
 import ViewContractor from "../pages/Hr/contract & Nmr/ViewContractor";
+import PenaltyCardGrid from "../pages/tender/project penalty/PenaltyView";
 
 const AppRoutes = () => {
   return (
@@ -193,7 +194,11 @@ const AppRoutes = () => {
               <Route path="emd" element={<EMD />} />
               <Route path="dlp" element={<DLP />} />
               <Route path="securitydeposit" element={<SecurityDeposit />} />
-              <Route path="projectpenalty" element={<ProjectPenalty />} />
+              {/* <Route path="projectpenalty" element={<ProjectPenalty />} /> */}
+               <Route path="projectpenalty">
+                <Route index element={<ProjectPenalty />} />
+                <Route path="viewpenalty/:tender_id" element={<PenaltyCardGrid />} />
+              </Route>
             </Route>
             <Route path="/projects">
               <Route index element={<Project />} />

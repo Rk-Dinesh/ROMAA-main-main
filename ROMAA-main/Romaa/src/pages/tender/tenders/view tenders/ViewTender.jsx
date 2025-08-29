@@ -64,11 +64,11 @@ const tabs = [
       //   label: "Add BOQ",
       //   className: "bg-darkest-blue text-white",
       // },
-      {
-        label: "Upload BOQ",
-        className:
-          " dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
-      },
+      // {
+      //   label: "Upload BOQ",
+      //   className:
+      //     " dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
+      // },
       {
         label: "Export",
         icon: <TbFileExport size={23} />,

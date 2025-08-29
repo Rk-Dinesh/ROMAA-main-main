@@ -12,6 +12,15 @@ import { useSearch } from "./SearchBar";
 import { useNavigate } from "react-router-dom";
 import { IoClose } from "react-icons/io5";
 
+
+const truncateWords = (text, limit = 7) => {
+  if (!text) return "";
+  const words = text.split(" ");
+  if (words.length <= limit) return text;
+  return words.slice(0, limit).join(" ") + "...";
+};
+
+
 const Table = ({
   endpoint,
   columns = [],
@@ -245,7 +254,9 @@ const Table = ({
                         cellValue === "" ||
                         (typeof cellValue === "string" &&
                           cellValue.trim().toLowerCase() === "undefined");
-                      const displayValue = isEmpty ? "-" : cellValue;
+                      //const displayValue = isEmpty ? "-" : cellValue;
+                      const displayValue = isEmpty ? "-" : truncateWords(String(cellValue), 7);
+
 
                       return (
                         <td

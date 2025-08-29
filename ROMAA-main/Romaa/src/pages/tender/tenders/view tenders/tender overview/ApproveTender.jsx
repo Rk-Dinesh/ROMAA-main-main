@@ -113,8 +113,8 @@ const ApproveTender = ({ onclose}) => {
             },
           ].map((item, index) => (
             <React.Fragment key={index}>
-              <label className="font-semibold col-span-7">{item.label}</label>
-              <p className="text-sm font-light col-span-5">{item.value}</p>
+              <label className="font-semibold col-span-6">{item.label}</label>
+              <p className="text-sm font-light col-span-6 truncate">{item.value}</p>
             </React.Fragment>
           ))}
 
