@@ -28,6 +28,7 @@ const Table = ({
   deletetitle,
   FilterModal,
   exportModal = true,
+  UploadModal,
   title,
   subtitle,
   pagetitle,
@@ -52,6 +53,7 @@ const Table = ({
   const [showView, setShowView] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
 
   const itemsPerPage = 10;
 
@@ -120,6 +122,15 @@ const Table = ({
               bgColor="dark:bg-layout-dark bg-white"
               textColor="dark:text-white text-darkest-blue"
               onClick={onExport}
+            />
+          )}
+          {UploadModal && (
+            <Button
+              button_icon={<TbFileExport size={22} />}
+              button_name="Upload"
+              bgColor="dark:bg-layout-dark bg-white"
+              textColor="dark:text-white text-darkest-blue"
+              onClick={() => setShowUpload(true)}
             />
           )}
           {FilterModal && (
@@ -390,6 +401,12 @@ const Table = ({
         <FilterModal
           onclose={() => setShowFilter(false)}
           onFilter={handleFilter}
+        />
+      )}
+       {UploadModal && showUpload && (
+        <UploadModal
+          onclose={() => setShowUpload(false)}
+          onSuccess={onSuccess}
         />
       )}
     </div>

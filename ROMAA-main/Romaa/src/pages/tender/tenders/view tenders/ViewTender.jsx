@@ -159,19 +159,7 @@ const tabs = [
     ],
   },
   
-  {
-    id: "9",
-    label: "Preliminary",
-    component: <Preliminary />,
-    buttons: [
-      {
-        label: "Export",
-        icon: <TbFileExport size={23} />,
-        className:
-          " dark:bg-layout-dark  dark:text-white bg-white text-darkest-blue",
-      },
-    ],
-  },
+ 
 ];
 // const tenderBreadcrumb = [{ label: "Tender", to: ".." }];
 // const tabBreadcrumbs = {

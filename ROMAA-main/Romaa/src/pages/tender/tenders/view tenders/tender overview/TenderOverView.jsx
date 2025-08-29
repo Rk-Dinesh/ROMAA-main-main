@@ -127,33 +127,35 @@ const TenderOverView = () => {
     }
   };
 
-  const fetchProcessData = async () => {
-    try {
-      const res = await axios.get(`${API}/tender/process/${tender_id}`);
-      const savedData = res.data?.processData || [];
+ const fetchProcessData = async () => {
+  try {
+    const res = await axios.get(`${API}/tender/process/${tender_id}`);
+    const savedData = Array.isArray(res.data?.processData) ? res.data.processData : [];
 
-      const initialData = tenderProcessDataTemplate.map((step) => {
-        const savedStep = savedData.find((d) => d.key === step.key);
-        return {
-          ...step,
-          notes: savedStep?.notes || "",
-          date: savedStep?.date || "",
-          time: savedStep?.time || "",
-          completed: savedStep?.completed === true,
-          file_name: savedStep?.file_name || "",
-          file_url: savedStep?.file_url || "",
-        };
-      });
-      setTenderProcessState(initialData);
-    } catch (error) {
-      console.error("Error fetching process data:", error);
-    }
-  };
+    const initialData = tenderProcessDataTemplate.map((step) => {
+      const savedStep = savedData.find((d) => d.key === step.key) || {};
+      return {
+        ...step,
+        notes: savedStep.notes || "",
+        date: savedStep.date || "",
+        time: savedStep.time || "",
+        completed: savedStep.completed === true,
+        file_name: savedStep.file_name || "",
+        file_url: savedStep.file_url || "",
+      };
+    });
+
+    setTenderProcessState(initialData);
+  } catch (error) {
+    console.error("Error fetching process data:", error);
+  }
+};
+
 
    const fetchPreliminaryData = async () => {
     try {
       const res = await axios.get(`${API}/tender/preliminary/${tender_id}`);
-      const savedData = res.data?.processData || [];
+      const savedData = Array.isArray(res.data?.processData) ? res.data.processData : [];
 
       const initialData = preliminarySiteWorkTemplate.map((step) => {
         const savedStep = savedData.find((d) => d.key === step.key);

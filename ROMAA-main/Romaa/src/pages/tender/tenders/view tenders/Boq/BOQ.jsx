@@ -7,6 +7,7 @@ import { API } from "../../../../../constant";
 import { toast } from "react-toastify";
 import { LuUserRoundSearch } from "react-icons/lu";
 import AddBoq from "./AddBoq";
+import UploadBoq from "./UploadBoq";
 
 const customerColumns = [
   { label: "Item Name", key: "item_name" },
@@ -24,6 +25,12 @@ const BOQ = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleUploadSuccess = () => {
+    setShowModal(false);
+    fetchBoqItems();
+  };
 
   const fetchBoqItems = async () => {
     if (!tender_id) return;
@@ -61,26 +68,35 @@ const BOQ = () => {
   };
 
   return (
-    <Table
-      title="Bill Of Quantity"
-      subtitle={`Tender: ${tender_id}`}
-      endpoint={items}
-      columns={customerColumns}
-      //EditModal={true}
-      exportModal={false}
-      DeleteModal={DeleteModal}
-      deletetitle="BOQ"
-      AddModal={AddBoq}
-      addButtonLabel="Add Boq"
-      addButtonIcon={<LuUserRoundSearch size={24} />}
-      totalPages={totalPages}
-      currentPage={currentPage}
-      setCurrentPage={setCurrentPage}
-      onUpdated={fetchBoqItems}
-      onSuccess={fetchBoqItems}
-      onDelete={handleDeleteBoqItem}
-      idKey="item_code"
-    />
+    <>
+      <Table
+        title="Bill Of Quantity"
+        subtitle={`Tender: ${tender_id}`}
+        endpoint={items}
+        columns={customerColumns}
+        //EditModal={true}
+        exportModal={false}
+        UploadModal={UploadBoq}
+        DeleteModal={DeleteModal}
+        deletetitle="BOQ"
+        AddModal={AddBoq}
+        addButtonLabel="Add Boq"
+        addButtonIcon={<LuUserRoundSearch size={24} />}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        onUpdated={fetchBoqItems}
+        onSuccess={fetchBoqItems}
+        onDelete={handleDeleteBoqItem}
+        idKey="item_code"
+      />
+      {/* {showModal && (
+        <UploadBoq
+          onClose={() => setShowModal(false)}
+          onUploadSuccess={handleUploadSuccess}
+        />
+      )} */}
+    </>
   );
 };
 
