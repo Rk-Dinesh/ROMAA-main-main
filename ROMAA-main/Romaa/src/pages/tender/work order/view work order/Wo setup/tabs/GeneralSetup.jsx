@@ -1,13 +1,25 @@
 import React from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 const Generaldata = [
   { label: "Business Type", value: "Contractor" },
   { label: "Project Division", value: "Housing" },
   { label: "Project Name", value: "Madurai shed" },
   { label: "Project Type", value: "Industrial"},
-  { label: "Is it SEZ Project", value: "No"},
+
 ];
 
+const schema = yup.object().shape({
+  project_name: yup.string().required("Project Name is required"),
+  project_type: yup.string().required("Project Type is required"),
+  business_type: yup.string().required("Business Type is required"),
+  project_division: yup.string().required("Project Division is required"),
+});
+
 const GeneralSetup = () => {
+
+  
   return (
     <div className="h-full">
       <div className=" dark:bg-layout-dark bg-white w-full rounded-md p-6">

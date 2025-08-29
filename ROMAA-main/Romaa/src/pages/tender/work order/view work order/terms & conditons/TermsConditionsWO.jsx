@@ -17,24 +17,24 @@ const tabs = [
   //   label: "Price Escalation",
   //   component:<PriceEscalation/>,
   // },
-  {
-    id: "2",
-    label: "Client Supply Materails",
-    component:<ClientsupplyMaterials/>,
+  // {
+  //   id: "2",
+  //   label: "Client Supply Materails",
+  //   component:<ClientsupplyMaterials/>,
 
-  },
-  {
-    id: "3",
-    label: "Materail Advance",
-    component:<MaterialAdvance/>,
+  // },
+  // {
+  //   id: "3",
+  //   label: "Materail Advance",
+  //   component:<MaterialAdvance/>,
 
-  },
-  {
-    id: "4",
-    label: "Technical Specifications",
-    component:<TechnicalSpecifications/>,
+  // },
+  // {
+  //   id: "4",
+  //   label: "Technical Specifications",
+  //   component:<TechnicalSpecifications/>,
  
-  },
+  // },
   {
     id: "5",
     label: "Other Terms",

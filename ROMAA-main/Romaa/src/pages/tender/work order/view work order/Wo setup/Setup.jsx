@@ -15,27 +15,27 @@ const tabs = [
     label: "General",
     component:<GeneralSetup/>,
   },
-  {
-    id: "2",
-    label: "WBS Required",
-    component:<WBSRequired/>,
+  // {
+  //   id: "2",
+  //   label: "WBS Required",
+  //   component:<WBSRequired/>,
 
 
-  },
-  {
-    id: "3",
-    label: "Materail Options",
-    component:<MaterialOptions/>,
+  // },
+  // {
+  //   id: "3",
+  //   label: "Materail Options",
+  //   component:<MaterialOptions/>,
 
 
-  },
-  {
-    id: "4",
-    label: "Others",
-    component:<OthersSetup/>,
+  // },
+  // {
+  //   id: "4",
+  //   label: "Others",
+  //   component:<OthersSetup/>,
 
  
-  },
+  // },
 
  
 ];
